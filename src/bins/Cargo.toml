@@ -69,6 +69,10 @@ sha1_smol.workspace = true
 rayon.workspace = true
 progress-streams.workspace = true
 flate2.workspace = true
+serde_json.workspace = true
+serde.workspace = true
+gettext.workspace = true
+quick-xml.workspace = true
 
 [target.'cfg(target_os="linux")'.dependencies]
 waitpid-any.workspace = true

@@ -1,4 +1,5 @@
 ﻿using System.Security;
+using System.Text;
 using System.Text.RegularExpressions;
 using Markdig;
 using Microsoft.Extensions.Logging;
@@ -9,6 +10,8 @@ using Velopack.NuGet;
 using Velopack.Packaging.Abstractions;
 using Velopack.Packaging.Compression;
 using Velopack.Util;
+
+#nullable enable
 
 namespace Velopack.Packaging;
 
@@ -30,6 +33,7 @@ public abstract class PackageBuilder<T> : ICommand<T>
     protected Dictionary<string, string> ExtraNuspecMetadata { get; } = new();
 
     private readonly Regex REGEX_EXCLUDES = new(@".*[\\\/]createdump.*|.*\.vshost\..*|.*\.nupkg$", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
 
     public PackageBuilder(RuntimeOs supportedOs, ILogger logger, IFancyConsole console)
     {
@@ -71,6 +75,7 @@ public abstract class PackageBuilder<T> : ICommand<T>
 
         using var _1 = TempUtil.GetTempDirectory(out var pkgTempDir);
         TempDir = new DirectoryInfo(pkgTempDir);
+
 
         var packId = options.PackId;
         var packDirectory = options.PackDirectory;
@@ -288,7 +293,9 @@ public abstract class PackageBuilder<T> : ICommand<T>
 
         var metadataFiles = GetReleaseMetadataFiles();
         foreach (var kvp in metadataFiles) {
-            File.Copy(kvp.Value, Path.Combine(stagingDir.FullName, kvp.Key), true);
+            var destPath = Path.Combine(stagingDir.FullName, kvp.Key);
+            Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
+            File.Copy(kvp.Value, destPath, true);
         }
 
         AddContentTypesAndRel(nuspecPath);
@@ -297,7 +304,44 @@ public abstract class PackageBuilder<T> : ICommand<T>
         progress(100);
     }
 
-    protected virtual Dictionary<string, string> GetReleaseMetadataFiles() => [];
+    /// <summary>
+    /// Gets additional metadata files to include in the release package.
+    /// Passes through localization files directly from the user-provided directory without conversion.
+    /// Includes common formats supported by runtime (.xlf, .po). Files are laid out under 'localization/'.
+    /// Directory structure is expected to be two levels deep: <root>/<culture>/(velopack.xlf|velopack.po).
+    /// </summary>
+    protected virtual Dictionary<string, string> GetReleaseMetadataFiles()
+    {
+        var metadataFiles = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        var locDir = Options.LocalizationDirectory;
+        if (!string.IsNullOrWhiteSpace(locDir) && Directory.Exists(locDir)) {
+            var rootFull = Path.GetFullPath(locDir).TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+
+            foreach (var cultureDir in Directory.EnumerateDirectories(rootFull)) {
+                var cultureName = Path.GetFileName(cultureDir);
+                // Prefer XLIFF if present, otherwise PO
+                var xlfPath = Path.Combine(cultureDir, "velopack.xlf");
+                var poPath = Path.Combine(cultureDir, "velopack.po");
+
+                string? chosen = null;
+                if (File.Exists(xlfPath)) {
+                    chosen = xlfPath;
+                } else if (File.Exists(poPath)) {
+                    chosen = poPath;
+                }
+
+                if (chosen != null) {
+                    var fileName = Path.GetFileName(chosen);
+                    var relativePath = $"localization/{cultureName}/{fileName}";
+                    metadataFiles[relativePath.Replace('\\', '/')] = chosen;
+                }
+            }
+        }
+
+        return metadataFiles;
+    }
+
 
     protected virtual void CopyFiles(DirectoryInfo source, DirectoryInfo target, Action<int> progress, bool excludeAnnoyances = false)
     {

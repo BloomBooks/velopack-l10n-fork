@@ -19,6 +19,11 @@ public class LinuxPackOptions : IPackOptions
 
     public string EntryExecutableName { get; set; }
 
+    /// <summary>
+    /// Localization directory path. Currently unused for Linux packaging but required by IPackOptions interface.
+    /// </summary>
+    public string? LocalizationDirectory { get; set; }
+
     public string Icon { get; set; }
 
     public RID TargetRuntime { get; set; }
@@ -36,6 +41,6 @@ public class LinuxPackOptions : IPackOptions
     public bool NoInst { get; set; }
 
     public string Categories { get; set; }
-    
+
     public string Compression { get; set; }
 }

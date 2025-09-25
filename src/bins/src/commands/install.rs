@@ -31,6 +31,8 @@ pub fn install(pkg: &mut BundleZip, install_to: Option<&PathBuf>, start_args: Op
     info!("    Package Machine Architecture: {}", &app.machine_architecture);
     info!("    Package Runtime Dependencies: {}", &app.runtime_dependencies);
 
+    shared::localization::initialize_from_bundle(pkg);
+
     if !windows::prerequisite::prompt_and_install_all_missing(&app, None)? {
         info!("Cancelling setup. Pre-requisites not installed.");
         return Ok(());
@@ -189,11 +191,11 @@ fn install_impl(pkg: &mut BundleZip, locator: &VelopackLocator, tx: &std::sync::
     info!("Starting process install hook");
     if !windows::run_hook(&locator, constants::HOOK_CLI_INSTALL, 30) {
         let setup_name = format!("{} Setup {}", locator.get_manifest_title(), locator.get_manifest_id());
-        dialogs::show_warn(
-            &setup_name,
-            None,
+        let message = shared::localization::text_or_default(
+            "dialogs.install_hook_failed.content",
             "Installation has completed, but the application install hook failed. It may not have installed correctly.",
         );
+        dialogs::show_warn(&setup_name, None, &message);
     }
 
     let _ = tx.send(100);

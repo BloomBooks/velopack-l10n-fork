@@ -15,6 +15,7 @@ dotnet publish -c Release -o %~dp0publish
 if errorlevel 1 exit /b 1
 
 echo.
-echo Building Velopack Release v%version%
-vpk pack -u VelopackCSharpWpf -v %version% -o %~dp0releases -p %~dp0publish -f net8-x64-desktop
+echo Building Velopack Release v%version% (with localization)
+rem The --localization flag includes French and Spanish installer dialogs from the localization/ folder
+vpk pack -u VelopackCSharpWpf -v %version% -o %~dp0releases -p %~dp0publish -f net8-x64-desktop --localization %~dp0localization
 if errorlevel 1 exit /b 1

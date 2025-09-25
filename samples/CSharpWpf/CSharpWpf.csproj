@@ -1,25 +1,23 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <AssemblyName>VelopackCSharpWpf</AssemblyName>
-    <TargetFramework>net48</TargetFramework>
-    <ImplicitUsings>true</ImplicitUsings>
-    <UseWPF>true</UseWPF>
-  </PropertyGroup>
-
-  <PropertyGroup>
-    <!-- This overrides the default Program.Main that WPF creates for you, and allows you to add VelopackApp -->
-    <StartupObject>CSharpWpf.App</StartupObject>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <ApplicationDefinition Remove="App.xaml" />
-    <Page Include="App.xaml" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\src\lib-csharp\Velopack.csproj" />
-  </ItemGroup>
-
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <AssemblyName>VelopackCSharpWpf</AssemblyName>
+        <TargetFramework>net48</TargetFramework>
+        <ImplicitUsings>true</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+    </PropertyGroup>
+    <PropertyGroup>
+        <!-- This overrides the default Program.Main that WPF creates for you, and allows you to add VelopackApp -->
+        <StartupObject>CSharpWpf.App</StartupObject>
+    </PropertyGroup>
+    <ItemGroup>
+        <ApplicationDefinition Remove="App.xaml" />
+        <Page Include="App.xaml" />
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\lib-csharp\Velopack.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <EmbeddedResource Include="localization\*.po" />
+    </ItemGroup>
 </Project>

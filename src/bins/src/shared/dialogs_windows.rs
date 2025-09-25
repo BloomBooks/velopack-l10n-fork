@@ -1,4 +1,5 @@
 use super::{dialogs_common::*, dialogs_const::*};
+use crate::shared::localization;
 use velopack::bundle::Manifest;
 use anyhow::Result;
 use std::path::PathBuf;
@@ -6,11 +7,18 @@ use winsafe::{self as w, co, prelude::*, WString};
 use velopack::locator::{auto_locate_app_manifest, LocationContext};
 
 pub fn show_restart_required(app: &Manifest) {
-    show_warn(
-        format!("{} Setup {}", app.title, app.version).as_str(),
-        Some("Restart Required"),
+    let version = app.version.to_string();
+    let title = localization::text_with_or(
+        "templates.setup_title",
+        &[("app_title", app.title.as_str()), ("app_version", version.as_str())],
+        "{app_title} Setup {app_version}",
+    );
+    let instruction = localization::text_or_default("dialogs.restart_required.instruction", "Restart Required");
+    let content = localization::text_or_default(
+        "dialogs.restart_required.content",
         "A restart is required before Setup can continue. Please restart your computer and try again.",
     );
+    show_warn(&title, Some(instruction.as_str()), &content);
 }
 
 pub fn show_update_missing_dependencies_dialog(
@@ -27,16 +35,35 @@ pub fn show_update_missing_dependencies_dialog(
         return false;
     }
 
-    show_ok_cancel(
-        format!("{} Update", app.title).as_str(),
-        Some(format!("{} would like to update from {} to {}", app.title, from, to).as_str()),
-        format!(
-            "{} {to} has missing dependencies which need to be installed: {}, would you like to continue?",
-            app.title, depedency_string
-        )
-            .as_str(),
-        Some("Install & Update"),
-    )
+    let from_version = from.to_string();
+    let to_version = to.to_string();
+    let title = localization::text_with_or(
+        "templates.update_title_no_version",
+        &[("app_title", app.title.as_str())],
+        "{app_title} Update",
+    );
+    let header = localization::text_with_or(
+        "dialogs.update_missing_dependencies.header",
+        &[
+            ("app_title", app.title.as_str()),
+            ("from_version", from_version.as_str()),
+            ("to_version", to_version.as_str()),
+        ],
+        "{app_title} would like to update from {from_version} to {to_version}",
+    );
+    let content = localization::text_with_or(
+        "dialogs.update_missing_dependencies.content",
+        &[
+            ("app_title", app.title.as_str()),
+            ("from_version", from_version.as_str()),
+            ("to_version", to_version.as_str()),
+            ("dependency_list", depedency_string),
+        ],
+        "{app_title} {to_version} has missing dependencies which need to be installed: {dependency_list}. Would you like to continue?",
+    );
+    let button = localization::text_or_default("buttons.install_and_update", "Install & Update");
+
+    show_ok_cancel(&title, Some(header.as_str()), &content, Some(button.as_str()))
 }
 
 pub fn show_setup_missing_dependencies_dialog(app: &Manifest, depedency_string: &str) -> bool {
@@ -44,13 +71,25 @@ pub fn show_setup_missing_dependencies_dialog(app: &Manifest, depedency_string: 
         return true;
     }
 
-    show_ok_cancel(
-        format!("{} Setup {}", app.title, app.version).as_str(),
-        Some(format!("{} has missing system dependencies.", app.title).as_str()),
-        format!("{} requires the following packages to be installed: {}, would you like to continue?", app.title, depedency_string)
-            .as_str(),
-        Some("Install"),
-    )
+    let version = app.version.to_string();
+    let title = localization::text_with_or(
+        "templates.setup_title",
+        &[("app_title", app.title.as_str()), ("app_version", version.as_str())],
+        "{app_title} Setup {app_version}",
+    );
+    let header = localization::text_with_or(
+        "dialogs.setup_missing_dependencies.header",
+        &[("app_title", app.title.as_str())],
+        "{app_title} has missing system dependencies.",
+    );
+    let content = localization::text_with_or(
+        "dialogs.setup_missing_dependencies.content",
+        &[("app_title", app.title.as_str()), ("dependency_list", depedency_string)],
+        "{app_title} requires the following packages to be installed: {dependency_list}. Would you like to continue?",
+    );
+    let button = localization::text_or_default("buttons.install", "Install");
+
+    show_ok_cancel(&title, Some(header.as_str()), &content, Some(button.as_str()))
 }
 
 pub fn show_uninstall_complete_with_errors_dialog(app_title: &str, log_path: Option<&PathBuf>) {
@@ -58,11 +97,20 @@ pub fn show_uninstall_complete_with_errors_dialog(app_title: &str, log_path: Opt
         return;
     }
 
-    let mut setup_name = WString::from_str(format!("{} Uninstall", app_title));
-    let mut instruction = WString::from_str(format!("{} uninstall has completed with errors.", app_title));
-    let mut content = WString::from_str(
+    let mut setup_name = WString::from_str(localization::text_with_or(
+        "templates.uninstall_title",
+        &[("app_title", app_title)],
+        "{app_title} Uninstall",
+    ));
+    let mut instruction = WString::from_str(localization::text_with_or(
+        "dialogs.uninstall_complete_with_errors.instruction",
+        &[("app_title", app_title)],
+        "{app_title} uninstall has completed with errors.",
+    ));
+    let mut content = WString::from_str(localization::text_or_default(
+        "dialogs.uninstall_complete_with_errors.content",
         "There may be left-over files or directories on your system. You can attempt to remove these manually or re-install the application and try again.",
-    );
+    ));
 
     let mut config: w::TASKDIALOGCONFIG = Default::default();
     config.dwFlags = co::TDF::ENABLE_HYPERLINKS | co::TDF::SIZE_TO_CONTENT;
@@ -73,7 +121,11 @@ pub fn show_uninstall_complete_with_errors_dialog(app_title: &str, log_path: Opt
     config.set_pszContent(Some(&mut content));
 
     let footer_path = log_path.map(|p| p.to_string_lossy().to_string()).unwrap_or("".to_string());
-    let mut footer = WString::from_str(format!("Log file: '<A HREF=\"na\">{}</A>'", footer_path));
+    let mut footer = WString::from_str(localization::text_with_or(
+        "dialogs.uninstall_complete_with_errors.footer",
+        &[("log_path", footer_path.as_str())],
+        "Log file: '<A HREF=\"na\">{log_path}</A>'",
+    ));
     if let Some(log_path) = log_path {
         if log_path.exists() {
             config.set_pszFooterIcon(w::IconId::Id(co::TD_ICON::INFORMATION.into()));
@@ -94,17 +146,35 @@ pub fn show_processes_locking_folder_dialog(app_title: &str, app_version: &str, 
     let mut config: w::TASKDIALOGCONFIG = Default::default();
     config.set_pszMainIcon(w::IconIdTdicon::Tdicon(co::TD_ICON::INFORMATION));
 
-    let mut update_name = WString::from_str(format!("{} Update {}", app_title, app_version));
-    let mut instruction = WString::from_str(format!("{} Update", app_title));
+    let mut update_name = WString::from_str(localization::text_with_or(
+        "templates.update_title",
+        &[("app_title", app_title), ("app_version", app_version)],
+        "{app_title} Update {app_version}",
+    ));
+    let mut instruction = WString::from_str(localization::text_with_or(
+        "templates.update_title_no_version",
+        &[("app_title", app_title)],
+        "{app_title} Update",
+    ));
 
-    let mut content = WString::from_str(format!(
-        "There are programs ({}) preventing the {} update from proceeding. \n\n\
-        You can press Continue to have this updater attempt to close them automatically, or if you've closed them yourself press Retry for the updater to check again.",
-        process_names, app_title));
+    let mut content = WString::from_str(localization::text_with_or(
+        "dialogs.processes_locking_folder.content",
+        &[("process_names", process_names), ("app_title", app_title)],
+        "There are programs ({process_names}) preventing the {app_title} update from proceeding.\n\nYou can press Continue to have this updater attempt to close them automatically, or if you've closed them yourself press Retry for the updater to check again.",
+    ));
 
-    let mut btn_retry_txt = WString::from_str("Retry\nTry again if you've closed the program(s)");
-    let mut btn_continue_txt = WString::from_str("Continue\nAttempt to close the program(s) automatically");
-    let mut btn_cancel_txt = WString::from_str("Cancel\nThe update will not continue");
+    let mut btn_retry_txt = WString::from_str(localization::text_or_default(
+        "buttons.retry_close_programs",
+        "Retry\nTry again if you've closed the program(s)",
+    ));
+    let mut btn_continue_txt = WString::from_str(localization::text_or_default(
+        "buttons.continue_close_programs",
+        "Continue\nAttempt to close the program(s) automatically",
+    ));
+    let mut btn_cancel_txt = WString::from_str(localization::text_or_default(
+        "buttons.cancel_stop_update",
+        "Cancel\nThe update will not continue",
+    ));
 
     let mut btn_retry = w::TASKDIALOG_BUTTON::default();
     btn_retry.set_nButtonID(co::DLGID::RETRY.into());
@@ -136,40 +206,102 @@ pub fn show_overwrite_repair_dialog(app: &Manifest, root_path: &PathBuf, root_is
 
     // these are the defaults, if we can't detect the current app version - we call it "Repair"
     let mut config: w::TASKDIALOGCONFIG = Default::default();
-    config.set_pszMainIcon(w::IconIdTdicon::Tdicon(co::TD_ICON::WARNING));
+    let mut icon = co::TD_ICON::WARNING;
 
-    let mut setup_name = WString::from_str(format!("{} Setup {}", app.title, app.version));
-    let mut instruction = WString::from_str(format!("{} is already installed.", app.title));
-    let mut content = WString::from_str(
+    let app_version = app.version.to_string();
+    let mut setup_name = WString::from_str(localization::text_with_or(
+        "templates.setup_title",
+        &[("app_title", app.title.as_str()), ("app_version", app_version.as_str())],
+        "{app_title} Setup {app_version}",
+    ));
+
+    let mut instruction_text = localization::text_with_or(
+        "dialogs.overwrite_repair.default_instruction",
+        &[("app_title", app.title.as_str())],
+        "{app_title} is already installed.",
+    );
+    let mut content_text = localization::text_with_or(
+        "dialogs.overwrite_repair.default_content",
+        &[("app_title", app.title.as_str())],
         "This application is installed on your computer. If it is not functioning correctly, you can attempt to repair it.",
     );
-    let mut btn_yes_txt = WString::from_str(format!("Repair\nErase the application and re-install version {}.", app.version));
-    let mut btn_cancel_txt = WString::from_str("Cancel\nBackup or save your work first");
+    let mut yes_button_text = localization::text_with_or(
+        "buttons.repair",
+        &[("app_version", app_version.as_str())],
+        "Repair\nErase the application and re-install version {app_version}.",
+    );
+    let cancel_button_text = localization::text_or_default(
+        "buttons.cancel_backup_first",
+        "Cancel\nBackup or save your work first",
+    );
 
     // if we can detect the current app version, we call it "Update" or "Downgrade"
     let old_app = auto_locate_app_manifest(LocationContext::FromSpecifiedRootDir(root_path.to_owned()));
     if let Ok(old) = old_app {
         let old_version = old.get_manifest_version();
         if old_version < app.version {
-            instruction = WString::from_str(format!("An older version of {} is installed.", app.title));
-            content = WString::from_str(format!("Would you like to update from {} to {}?", old_version, app.version));
-            btn_yes_txt = WString::from_str(format!("Update\nTo version {}", app.version));
-            config.set_pszMainIcon(w::IconIdTdicon::Tdicon(co::TD_ICON::INFORMATION));
+            let old_version_str = old_version.to_string();
+            instruction_text = localization::text_with_or(
+                "dialogs.overwrite_repair.update_instruction",
+                &[("app_title", app.title.as_str())],
+                "An older version of {app_title} is installed.",
+            );
+            content_text = localization::text_with_or(
+                "dialogs.overwrite_repair.update_content",
+                &[
+                    ("old_version", old_version_str.as_str()),
+                    ("new_version", app_version.as_str()),
+                ],
+                "Would you like to update from {old_version} to {new_version}?",
+            );
+            yes_button_text = localization::text_with_or(
+                "buttons.update",
+                &[("target_version", app_version.as_str())],
+                "Update\nTo version {target_version}",
+            );
+            icon = co::TD_ICON::INFORMATION;
         } else if old_version > app.version {
-            instruction = WString::from_str(format!("A newer version of {} is installed.", app.title));
-            content = WString::from_str(format!(
-                "You already have {} installed. Would you like to downgrade this application to an older version?",
-                old_version
-            ));
-            btn_yes_txt = WString::from_str(format!("Downgrade\nTo version {}", app.version));
+            let old_version_str = old_version.to_string();
+            instruction_text = localization::text_with_or(
+                "dialogs.overwrite_repair.downgrade_instruction",
+                &[("app_title", app.title.as_str())],
+                "A newer version of {app_title} is installed.",
+            );
+            content_text = localization::text_with_or(
+                "dialogs.overwrite_repair.downgrade_content",
+                &[("old_version", old_version_str.as_str())],
+                "You already have {old_version} installed. Would you like to downgrade this application to an older version?",
+            );
+            yes_button_text = localization::text_with_or(
+                "buttons.downgrade",
+                &[("target_version", app_version.as_str())],
+                "Downgrade\nTo version {target_version}",
+            );
         }
     }
 
-    let mut footer = if root_is_default {
-        WString::from_str(format!("The install directory is '<A HREF=\"na\">%LocalAppData%\\{}</A>'", app.id))
+    config.set_pszMainIcon(w::IconIdTdicon::Tdicon(icon));
+
+    let mut instruction = WString::from_str(instruction_text);
+    let mut content = WString::from_str(content_text);
+    let mut btn_yes_txt = WString::from_str(yes_button_text);
+    let mut btn_cancel_txt = WString::from_str(cancel_button_text);
+
+    let custom_path = root_path.display().to_string();
+    let footer_string = if root_is_default {
+        localization::text_with_or(
+            "templates.install_directory_default",
+            &[("app_id", app.id.as_str())],
+            "The install directory is '<A HREF=\"na\">%LocalAppData%\\{app_id}</A>'",
+        )
     } else {
-        WString::from_str(format!("The install directory is '<A HREF=\"na\">{}</A>'", root_path.display()))
+        localization::text_with_or(
+            "templates.install_directory_custom",
+            &[("path", custom_path.as_str())],
+            "The install directory is '<A HREF=\"na\">{path}</A>'",
+        )
     };
+    let mut footer = WString::from_str(footer_string);
 
     let mut btn_yes = w::TASKDIALOG_BUTTON::default();
     btn_yes.set_nButtonID(co::DLGID::YES.into());

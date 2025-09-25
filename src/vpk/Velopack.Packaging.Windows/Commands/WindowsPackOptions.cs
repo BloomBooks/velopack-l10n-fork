@@ -18,6 +18,8 @@ public class WindowsPackOptions : WindowsReleasifyOptions, INugetPackCommand, IP
 
     public string Exclude { get; set; }
 
+    public string? LocalizationDirectory { get; set; }
+
     public bool NoPortable { get; set; }
 
     public bool NoInst { get; set; }

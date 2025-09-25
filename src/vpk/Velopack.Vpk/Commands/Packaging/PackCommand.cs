@@ -42,6 +42,10 @@ public abstract class PackCommand : PlatformCommand
 
     protected CliOption<DeltaMode> DeltaModeOption { get; private set; }
 
+    public string? LocalizationDirectory { get; private set; }
+
+    protected CliOption<DirectoryInfo> LocalizationDirectoryOption { get; private set; }
+
     public string Exclude { get; private set; }
 
     protected CliOption<string> ExcludeOption { get; private set; }
@@ -74,6 +78,11 @@ public abstract class PackCommand : PlatformCommand
             .SetDescription("Directory containing application files for release.")
             .SetArgumentHelpName("DIR")
             .SetRequired();
+
+        LocalizationDirectoryOption = AddOption<DirectoryInfo>((v) => LocalizationDirectory = v.ToFullNameOrNull(), "--localization")
+            .SetDescription("Path to a folder containing localized dialog files grouped by culture. Supports PO and XLIFF formats (for example 'en/velopack.po', 'fr/velopack.xlf').")
+            .SetArgumentHelpName("DIR")
+            .MustExist();
 
         PackAuthorsOption = AddOption<string>((v) => PackAuthors = v, "--packAuthors")
             .SetDescription("Company name or comma-delimited list of authors.")

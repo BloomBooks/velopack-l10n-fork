@@ -1,0 +1,149 @@
+# English (Default) localization for Velopack dialogs
+# Copyright (C) 2024 Velopack Ltd
+# This file is distributed under the same license as the Velopack package.
+#
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: en\n"
+"MIME-Version: 1.0\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+# Template strings
+msgid "templates.setup_title"
+msgstr "{app_title} Setup {app_version}"
+
+msgid "templates.setup_title_no_version"
+msgstr "{app_title} Setup"
+
+msgid "templates.update_title"
+msgstr "{app_title} Update {app_version}"
+
+msgid "templates.update_title_no_version"
+msgstr "{app_title} Update"
+
+msgid "templates.uninstall_title"
+msgstr "{app_title} Uninstall"
+
+msgid "templates.error_title"
+msgstr "{program_name} Error"
+
+msgid "templates.install_directory_default"
+msgstr "The install directory is '<A HREF=\"na\">%LocalAppData%\\{app_id}</A>'"
+
+msgid "templates.install_directory_custom"
+msgstr "The install directory is '<A HREF=\"na\">{path}</A>'"
+
+# Progress messages
+msgid "progress.installing_app"
+msgstr "Installing {app_title}..."
+
+msgid "progress.downloading_runtime"
+msgstr "Downloading {runtime_name}..."
+
+# Button labels
+msgid "buttons.ok"
+msgstr "Ok"
+
+msgid "buttons.yes"
+msgstr "Yes"
+
+msgid "buttons.no"
+msgstr "No"
+
+msgid "buttons.install_update"
+msgstr "Install Update"
+
+msgid "buttons.install_and_update"
+msgstr "Install & Update"
+
+msgid "buttons.install"
+msgstr "Install"
+
+msgid "buttons.hide"
+msgstr "Hide"
+
+msgid "buttons.retry_close_programs"
+msgstr "Retry\\nTry again if you've closed the program(s)"
+
+msgid "buttons.continue_close_programs"
+msgstr "Continue\\nAttempt to close the program(s) automatically"
+
+msgid "buttons.cancel_stop_update"
+msgstr "Cancel\\nThe update will not continue"
+
+msgid "buttons.repair"
+msgstr "Repair\\nErase the application and re-install version {app_version}."
+
+msgid "buttons.update"
+msgstr "Update\\nTo version {target_version}"
+
+msgid "buttons.downgrade"
+msgstr "Downgrade\\nTo version {target_version}"
+
+msgid "buttons.cancel_backup_first"
+msgstr "Cancel\\nBackup or save your work first"
+
+# Dialog content
+msgid "dialogs.restart_required.instruction"
+msgstr "Restart Required"
+
+msgid "dialogs.restart_required.content"
+msgstr "A restart is required before Setup can continue. Please restart your computer and try again."
+
+msgid "dialogs.update_missing_dependencies.header"
+msgstr "{app_title} would like to update from {from_version} to {to_version}"
+
+msgid "dialogs.update_missing_dependencies.content"
+msgstr "{app_title} {to_version} has missing dependencies which need to be installed: {dependency_list}. Would you like to continue?"
+
+msgid "dialogs.setup_missing_dependencies.header"
+msgstr "{app_title} has missing system dependencies."
+
+msgid "dialogs.setup_missing_dependencies.content"
+msgstr "{app_title} requires the following packages to be installed: {dependency_list}. Would you like to continue?"
+
+msgid "dialogs.uninstall_complete_with_errors.instruction"
+msgstr "{app_title} uninstall has completed with errors."
+
+msgid "dialogs.uninstall_complete_with_errors.content"
+msgstr "There may be left-over files or directories on your system. You can attempt to remove these manually or re-install the application and try again."
+
+msgid "dialogs.uninstall_complete_with_errors.footer"
+msgstr "Log file: '<A HREF=\"na\">{log_path}</A>'"
+
+msgid "dialogs.processes_locking_folder.content"
+msgstr "There are programs ({process_names}) preventing the {app_title} update from proceeding.\\n\\nYou can press Continue to have this updater attempt to close them automatically, or if you've closed them yourself press Retry for the updater to check again."
+
+msgid "dialogs.overwrite_repair.default_instruction"
+msgstr "{app_title} is already installed."
+
+msgid "dialogs.overwrite_repair.default_content"
+msgstr "This application is installed on your computer. If it is not functioning correctly, you can attempt to repair it."
+
+msgid "dialogs.overwrite_repair.update_instruction"
+msgstr "An older version of {app_title} is installed."
+
+msgid "dialogs.overwrite_repair.update_content"
+msgstr "Would you like to update from {old_version} to {new_version}?"
+
+msgid "dialogs.overwrite_repair.downgrade_instruction"
+msgstr "A newer version of {app_title} is installed."
+
+msgid "dialogs.overwrite_repair.downgrade_content"
+msgstr "You already have {old_version} installed. Would you like to downgrade this application to an older version?"
+
+msgid "dialogs.elevation_prompt.content"
+msgstr "{app_title} would like to update to version {new_version}, but requires elevated permissions to do so. Would you like to proceed?"
+
+msgid "dialogs.install_hook_failed.content"
+msgstr "Installation has completed, but the application install hook failed. It may not have installed correctly."
+
+msgid "dialogs.legacy_migration_failed.header"
+msgstr "Unable to start app"
+
+msgid "dialogs.legacy_migration_failed.content"
+msgstr "This app installation has been corrupted and cannot be started. Please re-install the app."
+
+msgid "dialogs.uninstall_success.content"
+msgstr "The application was successfully uninstalled."

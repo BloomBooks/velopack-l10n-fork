@@ -1,5 +1,6 @@
 use super::dialogs::{generate_alert, generate_confirm};
 use super::dialogs_const::*;
+use crate::shared::localization;
 use std::sync::atomic::{AtomicBool, Ordering};
 use anyhow::{Result, bail};
 
@@ -48,12 +49,20 @@ pub fn ask_user_to_elevate(app_title: &str, new_version: &str) -> Result<()> {
         bail!("Not allowed to ask for elevated permissions because --silent flag is set.");
     }
 
-    let title = format!("{} Update", app_title);
-    let body =
-        format!("{} would like to update to version {}, but requires elevated permissions to do so. Would you like to proceed?", app_title, new_version);
+    let title = localization::text_with_or(
+        "templates.update_title_no_version",
+        &[("app_title", app_title)],
+        "{app_title} Update",
+    );
+    let body = localization::text_with_or(
+        "dialogs.elevation_prompt.content",
+        &[("app_title", app_title), ("new_version", new_version)],
+        "{app_title} would like to update to version {new_version}, but requires elevated permissions to do so. Would you like to proceed?",
+    );
+    let ok_text = localization::text_or_default("buttons.install_update", "Install Update");
 
     info!("Showing user elevation prompt?");
-    if show_ok_cancel(title.as_str(), None, body.as_str(), Some("Install Update")) {
+    if show_ok_cancel(title.as_str(), None, body.as_str(), Some(ok_text.as_str())) {
         info!("User answered yes to elevation...");
         Ok(())
     } else {

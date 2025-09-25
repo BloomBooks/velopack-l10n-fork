@@ -215,7 +215,7 @@ public class WindowsPackCommandRunner : PackageBuilder<WindowsPackOptions>
         SetupBundle.CreatePackageBundle(targetSetupExe, releasePkg);
         setupExeProgress(50);
         Log.Debug("Signing Setup bundle");
-        SignFilesImpl(CoreUtil.CreateProgressDelegate( setupExeProgress, 50, 100), targetSetupExe);
+        SignFilesImpl(CoreUtil.CreateProgressDelegate(setupExeProgress, 50, 100), targetSetupExe);
         Log.Debug($"Setup bundle created '{Path.GetFileName(targetSetupExe)}'.");
         setupExeProgress(100);
 
@@ -254,7 +254,7 @@ public class WindowsPackCommandRunner : PackageBuilder<WindowsPackOptions>
 
     protected override Dictionary<string, string> GetReleaseMetadataFiles()
     {
-        var dict = new Dictionary<string, string>();
+        var dict = base.GetReleaseMetadataFiles();
         if (Options.Icon != null) dict["setup.ico"] = Options.Icon;
         if (Options.SplashImage != null) dict["splashimage" + Path.GetExtension(Options.SplashImage)] = Options.SplashImage;
         return dict;
@@ -346,7 +346,7 @@ public class WindowsPackCommandRunner : PackageBuilder<WindowsPackOptions>
     private void CompileWixTemplateToMsi(Action<int> progress,
         string setupExePath, string msiFilePath)
     {
-        bool packageAs64Bit = 
+        bool packageAs64Bit =
             Options.TargetRuntime.Architecture is RuntimeCpu.x64 or RuntimeCpu.arm64;
 
         Log.Info($"Compiling machine-wide msi deployment tool in {(packageAs64Bit ? "64-bit" : "32-bit")} mode");

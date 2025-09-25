@@ -41,6 +41,7 @@ use velopack::{bundle::load_bundle_from_file, constants, locator::VelopackLocato
 
 pub fn apply_package_impl(old_locator: &VelopackLocator, package: &PathBuf, run_hooks: bool) -> Result<VelopackLocator> {
     let mut bundle = load_bundle_from_file(package)?;
+    shared::localization::initialize_from_bundle(&bundle);
     let new_app_manifest = bundle.read_manifest()?;
     let new_locator = old_locator.clone_self_with_new_manifest(&new_app_manifest);
 

@@ -1,5 +1,7 @@
 ﻿using Velopack.Packaging.Compression;
 
+#nullable enable
+
 namespace Velopack.Packaging.Abstractions;
 
 public interface IPackOptions : INugetPackCommand, IPlatformOptions
@@ -11,4 +13,9 @@ public interface IPackOptions : INugetPackCommand, IPlatformOptions
     string Exclude { get; set; }
     bool NoPortable { get; set; }
     bool NoInst { get; set; }
+
+    /// <summary>
+    /// Path to directory containing localized dialog files grouped by culture (e.g., 'en/velopack.po', 'fr/velopack.xlf')
+    /// </summary>
+    string? LocalizationDirectory { get; set; }
 }

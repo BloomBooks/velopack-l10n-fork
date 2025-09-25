@@ -179,6 +179,24 @@ impl BundleZip<'_> {
         Ok(idx)
     }
 
+    pub fn read_zip_idx_to_string(&self, index: usize) -> Result<String, Error> {
+        let mut archive = self.zip.borrow_mut();
+        let mut file = archive.by_index(index)?;
+        let mut contents = String::new();
+        file.read_to_string(&mut contents)?;
+        Ok(contents)
+    }
+
+    pub fn read_zip_predicate_to_string<F>(&self, predicate: F) -> Result<String, Error>
+    where
+        F: Fn(&str) -> bool,
+    {
+        let idx = self
+            .find_zip_file(predicate)
+            .ok_or_else(|| Error::FileNotFound("(zip bundle predicate)".to_owned()))?;
+        self.read_zip_idx_to_string(idx)
+    }
+
     pub fn read_manifest(&mut self) -> Result<Manifest, Error> {
         if let Some(manifest) = &self.manifest {
             return Ok(manifest.clone());

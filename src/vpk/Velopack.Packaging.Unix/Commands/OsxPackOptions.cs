@@ -19,6 +19,11 @@ public class OsxPackOptions : OsxBundleOptions, IPackOptions
 
     public string InstReadme { get; set; }
 
+    /// <summary>
+    /// Localization directory path. Currently unused for macOS packaging but required by IPackOptions interface.
+    /// </summary>
+    public string? LocalizationDirectory { get; set; }
+
     public string InstLicense { get; set; }
 
     public string InstConclusion { get; set; }
@@ -28,7 +33,7 @@ public class OsxPackOptions : OsxBundleOptions, IPackOptions
     public string SignInstallIdentity { get; set; }
 
     public string SignEntitlements { get; set; }
-    
+
     public bool SignDisableDeep { get; set; }
 
     public string NotaryProfile { get; set; }

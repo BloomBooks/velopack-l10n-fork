@@ -1,0 +1,139 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Language: fr\n"
+
+msgid "buttons.install"
+msgstr "Installer"
+
+msgid "templates.setup_title"
+msgstr "Installation de {0}"
+
+msgid "templates.setup_title_no_version"
+msgstr "Installation"
+
+msgid "templates.update_title"
+msgstr "Mise à jour de {0}"
+
+msgid "templates.update_title_no_version"
+msgstr "Mise à jour"
+
+msgid "templates.uninstall_title"
+msgstr "Désinstaller {0}"
+
+msgid "templates.error_title"
+msgstr "Erreur"
+
+msgid "templates.install_directory_default"
+msgstr "Installer pour tous les utilisateurs"
+
+msgid "templates.install_directory_custom"
+msgstr "Installer pour l'utilisateur actuel seulement"
+
+msgid "progress.installing_app"
+msgstr "Installation de {0} en cours..."
+
+msgid "progress.downloading_runtime"
+msgstr "Téléchargement de {0}..."
+
+msgid "buttons.ok"
+msgstr "OK"
+
+msgid "buttons.yes"
+msgstr "Oui"
+
+msgid "buttons.no"
+msgstr "Non"
+
+msgid "buttons.install_update"
+msgstr "Installer la mise à jour"
+
+msgid "buttons.install_and_update"
+msgstr "Installer et mettre à jour"
+
+msgid "buttons.hide"
+msgstr "Masquer"
+
+msgid "buttons.retry_close_programs"
+msgstr "Réessayer"
+
+msgid "buttons.continue_close_programs"
+msgstr "Continuer"
+
+msgid "buttons.cancel_stop_update"
+msgstr "Annuler"
+
+msgid "buttons.repair"
+msgstr "Réparer"
+
+msgid "buttons.update"
+msgstr "Mettre à jour"
+
+msgid "buttons.downgrade"
+msgstr "Rétrograder"
+
+msgid "buttons.cancel_backup_first"
+msgstr "Annuler (sauvegarder d'abord)"
+
+msgid "dialogs.restart_required.instruction"
+msgstr "Redémarrage requis"
+
+msgid "dialogs.restart_required.content"
+msgstr "Vous devez redémarrer votre ordinateur pour terminer l'installation."
+
+msgid "dialogs.update_missing_dependencies.header"
+msgstr "Dépendances manquantes"
+
+msgid "dialogs.update_missing_dependencies.content"
+msgstr "Cette mise à jour nécessite .NET {0} ou une version ultérieure."
+
+msgid "dialogs.setup_missing_dependencies.header"
+msgstr "Dépendances manquantes"
+
+msgid "dialogs.setup_missing_dependencies.content"
+msgstr "Cette application nécessite .NET {0} ou une version ultérieure."
+
+msgid "dialogs.uninstall_complete_with_errors.instruction"
+msgstr "Désinstallation terminée avec des erreurs"
+
+msgid "dialogs.uninstall_complete_with_errors.content"
+msgstr "Certains fichiers n'ont pas pu être supprimés."
+
+msgid "dialogs.uninstall_complete_with_errors.footer"
+msgstr "Vous devrez peut-être les supprimer manuellement."
+
+msgid "dialogs.processes_locking_folder.content"
+msgstr "Les processus suivants empêchent la mise à jour de {0} :"
+
+msgid "dialogs.overwrite_repair.default_instruction"
+msgstr "Réparer ou désinstaller"
+
+msgid "dialogs.overwrite_repair.default_content"
+msgstr "{0} est déjà installé. Voulez-vous réparer l'installation actuelle ou la désinstaller ?"
+
+msgid "dialogs.overwrite_repair.update_instruction"
+msgstr "Mise à jour disponible"
+
+msgid "dialogs.overwrite_repair.update_content"
+msgstr "Une version plus récente de {0} est disponible. Voulez-vous mettre à jour maintenant ?"
+
+msgid "dialogs.overwrite_repair.downgrade_instruction"
+msgstr "Rétrogradation disponible"
+
+msgid "dialogs.overwrite_repair.downgrade_content"
+msgstr "Une version plus ancienne de {0} va être installée. Voulez-vous rétrograder ?"
+
+msgid "dialogs.elevation_prompt.content"
+msgstr "{0} a besoin des permissions d'administrateur pour compléter cette opération."
+
+msgid "dialogs.install_hook_failed.content"
+msgstr "Installation terminée, mais il y a eu des erreurs lors de l'exécution des scripts post-installation."
+
+msgid "dialogs.legacy_migration_failed.header"
+msgstr "Échec de la migration"
+
+msgid "dialogs.legacy_migration_failed.content"
+msgstr "Échec de la migration depuis l'ancien installateur. Vous devrez peut-être désinstaller l'ancienne version d'abord."
+
+msgid "dialogs.uninstall_success.content"
+msgstr "{0} a été désinstallé avec succès."
