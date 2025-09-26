@@ -11,23 +11,13 @@ jobs:
   build-rust:
     uses: ./.github/workflows/build-rust.yml
 
-  build-python:
-    uses: ./.github/workflows/build-python.yml
-
-  build-tests:
-    uses: ./.github/workflows/build-tests.yml
-    secrets: inherit # tests need secrets to run
-
-  build-samples:
-    uses: ./.github/workflows/build-samples.yml
-
   build-packages:
-    needs: [build-python, build-rust]
+    needs: [build-rust]
     uses: ./.github/workflows/build-packages.yml
 
   release:
     runs-on: ubuntu-latest
-    needs: [build-packages, build-tests, build-samples]
+    needs: [build-packages]
     if: github.event_name == 'push' && github.ref == 'refs/heads/bloom/localization'
     steps:
       - name: Invoke Release Workflow

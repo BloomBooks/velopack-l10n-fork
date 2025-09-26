@@ -39,50 +39,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./packages
 
-      - name: Download lib-nodejs
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-nodejs
-          run-id: ${{ github.event.inputs.workflow_run_id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./lib-nodejs
-
-      - name: Download lib-rust
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-rust
-          run-id: ${{ github.event.inputs.workflow_run_id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./lib-rust
-
-      - name: Download lib-c
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-c
-          run-id: ${{ github.event.inputs.workflow_run_id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./lib-c-files
-
-      - name: Create lib-c zip package
-        working-directory: ./lib-c-files
-        run: |
-          mkdir -p ../lib-c
-          zip -r ../lib-c/velopack_libc_$PKG_VERSION.zip .
-
-      - name: Download lib-python
-        uses: actions/download-artifact@v4
-        with:
-          name: lib-python
-          run-id: ${{ github.event.inputs.workflow_run_id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: ./lib-python-files
-
-      - name: Create lib-python zip package
-        working-directory: ./lib-python-files
-        run: |
-          mkdir -p ../lib-python
-          zip -r ../lib-python/velopack_libpython_$PKG_VERSION.zip .
-
       - uses: actions/checkout@v4
         with:
           path: ./repo
@@ -213,9 +169,5 @@ jobs:
           # Upload artifacts
           Write-Host "Uploading artifacts..."
           gh release upload $currentTag (get-item ../packages/*.nupkg)
-          gh release upload $currentTag (get-item ../lib-nodejs/*.tgz)
-          gh release upload $currentTag (get-item ../lib-rust/*.crate)
-          gh release upload $currentTag (get-item ../lib-c/*.zip)
-          gh release upload $currentTag (get-item ../lib-python/*.zip)
 
       # Note: External publishing (NuGet, npm, crates.io, PyPI) is disabled for this temporary fork.
