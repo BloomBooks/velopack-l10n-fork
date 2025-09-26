@@ -4,9 +4,9 @@ on:
   workflow_dispatch:
     inputs:
       workflow_run_id:
-        description: 'Workflow Run ID to publish'
+        description: "Workflow Run ID to publish"
         required: true
-        default: ''
+        default: ""
 
 env:
   GH_TOKEN: ${{ github.token }}
@@ -38,7 +38,7 @@ jobs:
           run-id: ${{ github.event.inputs.workflow_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./packages
-          
+
       - name: Download lib-nodejs
         uses: actions/download-artifact@v4
         with:
@@ -46,7 +46,7 @@ jobs:
           run-id: ${{ github.event.inputs.workflow_run_id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
           path: ./lib-nodejs
-          
+
       - name: Download lib-rust
         uses: actions/download-artifact@v4
         with:
@@ -87,7 +87,7 @@ jobs:
         with:
           path: ./repo
           fetch-depth: 0
-          
+
       - name: Checkout release commit
         working-directory: ./repo
         run: |
@@ -168,7 +168,7 @@ jobs:
               "tag_name" = "$currentTag"
               "previous_tag_name" = "$previousTag"
           } | ConvertTo-Json
-          $apiUrl = "https://api.github.com/repos/velopack/velopack/releases/generate-notes"
+          $apiUrl = "https://api.github.com/repos/${{ github.repository }}/releases/generate-notes"
           $response = Invoke-RestMethod -Uri $apiUrl -Method Post -Headers $headers -Body $body -ContentType 'application/json'
 
           $releaseName = $response.name
@@ -218,39 +218,4 @@ jobs:
           gh release upload $currentTag (get-item ../lib-c/*.zip)
           gh release upload $currentTag (get-item ../lib-python/*.zip)
 
-      - name: Publish NuGet Packages
-        run: |
-          for f in packages/*.nupkg; do
-            dotnet nuget push "$f" -k ${{ secrets.NUGET_API_KEY }} -s https://api.nuget.org/v3/index.json --skip-duplicate
-          done
-          
-      - name: Publish NPM Package
-        working-directory: ./lib-nodejs
-        run: |
-          npm set "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}"
-          npm publish velopack-$PKG_VERSION.tgz --access public
-          
-      - name: Publish Rust Crate
-        working-directory: ./lib-rust
-        run: |
-          tar -xzf velopack-$PKG_VERSION.crate
-          cd velopack-$PKG_VERSION
-          rm Cargo.toml.orig
-          rm .cargo_vcs_info.json
-          cargo login ${{ secrets.CARGO_TOKEN }}
-          cargo publish --allow-dirty --no-verify
-
-      # - name: Publish to TestPyPI
-      #   uses: pypa/gh-action-pypi-publish@release/v1
-      #   with:
-      #     repository-url: https://test.pypi.org/legacy/
-      #     password: ${{ secrets.TEST_PYPI_API_TOKEN }}
-      #     packages-dir: lib-python-files/
-      #     verbose: true
-
-      - name: Publish to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          packages-dir: lib-python-files/
-          verbose: true
+      # Note: External publishing (NuGet, npm, crates.io, PyPI) is disabled for this temporary fork.

@@ -3,7 +3,7 @@ on:
   workflow_call:
 
 jobs:
-  python: 
+  python:
     runs-on: ubuntu-latest
     steps:
       - name: Download Python Artifacts
@@ -28,6 +28,20 @@ jobs:
         uses: ./.github/actions/job-setup
         with:
           update-dotnet: true
+      - name: Compute PKG_VERSION from run number
+        id: compute_version
+        shell: pwsh
+        run: |
+          $fourPart = (nbgv get-version -v Version).Trim()
+          $base = $fourPart.Split('-')[0]
+          $parts = $base.Split('.')
+          $major = if ($parts.Length -ge 1) { $parts[0] } else { '0' }
+          $minor = if ($parts.Length -ge 2) { $parts[1] } else { '0' }
+          $patch = if ($parts.Length -ge 3) { $parts[2] } else { '0' }
+          $build = $env:GITHUB_RUN_NUMBER
+          if ([string]::IsNullOrEmpty($build)) { $build = "0" }
+          $pkgVersion = "$major.$minor.$patch.$build"
+          "pkg=$pkgVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - name: Download Rust Artifacts
         uses: actions/download-artifact@v4
         with:
@@ -35,14 +49,16 @@ jobs:
           pattern: rust-*
           merge-multiple: true
       - name: Build .NET
-        run: dotnet build -c Release /p:PackRustAssets=true /p:ContinuousIntegrationBuild=true
+        run:
+          dotnet build -c Release /p:PackRustAssets=true /p:ContinuousIntegrationBuild=true \
+          /p:Version=${{ steps.compute_version.outputs.pkg }} /p:PackageVersion=${{ steps.compute_version.outputs.pkg }}
       - name: Build lib-nodejs
         working-directory: src/lib-nodejs
         run: |
           npm install
           npm run build
       - name: Write Version File
-        run: echo $NBGV_NuGetPackageVersion > version.txt
+        run: echo "${{ steps.compute_version.outputs.pkg }}" > version.txt
       - name: Upload version file as artifact
         uses: actions/upload-artifact@v4
         with:

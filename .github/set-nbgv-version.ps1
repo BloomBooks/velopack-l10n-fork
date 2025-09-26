@@ -21,27 +21,9 @@ Write-Host "Setting version to $semverVersion"
     }
 } | Set-Content $path
 
-# setting nodejs version
-Set-Location "$scriptDir/src/lib-nodejs"
-npm version $semverVersion --no-git-tag-version
+# nodejs version is injected by workflow during packaging; skip npm version bump here
 
-# setting pyproject.toml version
-$pyprojectPath = [IO.Path]::Combine($scriptDir, 'src', 'lib-python', 'pyproject.toml')
-
-$pythonVersion = $semverVersion
-if ($pythonVersion -match '-g') {
-    $pythonVersion = $fourpartVersion -replace '^(\d+\.\d+\.\d+)\.(\d+)$', '${1}.dev${2}'
-}
-Write-Host "Python version to $pythonVersion"
-
-(Get-Content $pyprojectPath) | ForEach-Object {
-    if ($_ -match '^version\s*=\s*".*"') {
-        $_ -replace '^version\s*=\s*".*"', "version = `"$pythonVersion`""
-    }
-    else {
-        $_
-    }
-} | Set-Content $pyprojectPath
+# python version is injected by workflow during packaging; skip pyproject.toml rewrite here
 
 # copying README.md
 Copy-Item -Path "$scriptDir/README_NUGET.md" -Destination "$scriptDir/src/lib-nodejs/README.md" -Force
