@@ -6,7 +6,7 @@ use velopack::bundle::BundleZip;
 use quick_xml::de::from_str as xml_from_str;
 use serde::{Deserialize, Serialize};
 
-const DEFAULT_DIALOGS_PO: &str = include_str!("../../../localization/dialogs.en.po");
+const DEFAULT_PO_PATH: &str = include_str!("../../../localization/en/velopack.po");
 
 #[derive(Debug, Deserialize, Serialize)]
 struct XliffFile {
@@ -61,7 +61,7 @@ struct LocalizationState {
 
 impl LocalizationState {
     fn new() -> Self {
-        let base = parse_po_content(DEFAULT_DIALOGS_PO).expect("default localization is valid po");
+        let base = parse_po_content(DEFAULT_PO_PATH).expect("default localization is valid po");
         Self {
             default_english: base.clone(),
             english: base.clone(),
@@ -513,7 +513,7 @@ msgstr "Line 1\nLine 2\tTabbed"
     #[test]
     fn test_extract_locale_from_filename() {
         // filename-based detection
-        assert_eq!(extract_locale_from_filename("localization/dialogs.en.po"), Some("en".to_string()));
+        assert_eq!(extract_locale_from_filename("localization/en/velopack.po"), Some("en".to_string()));
         assert_eq!(extract_locale_from_filename("localization/dialogs.fr-CA.xliff"), Some("fr-ca".to_string()));
         assert_eq!(extract_locale_from_filename("localization/de.po"), Some("de".to_string()));
         assert_eq!(extract_locale_from_filename("localization/dialogs.json"), Some("dialogs".to_string()));
