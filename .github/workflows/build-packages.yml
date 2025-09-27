@@ -30,9 +30,18 @@ jobs:
       - name: Download Rust Artifacts
         uses: actions/download-artifact@v4
         with:
-          path: target/release
+          path: artifacts
           pattern: rust-windows-*
           merge-multiple: true
+      - name: Arrange Rust Artifacts
+        run: |
+          mkdir -p target/release
+          # Move Windows executables to expected location
+          find artifacts -name "*.exe" -exec cp {} target/release/ \;
+          # Move Windows libraries for packaging
+          find artifacts -name "*.dll" -exec cp {} target/release/ \;
+          find artifacts -name "*.lib" -exec cp {} target/release/ \;
+          ls -la target/release/
       - name: Build .NET
         run: |
           dotnet build -c Release /p:PackRustAssets=true /p:ContinuousIntegrationBuild=true \

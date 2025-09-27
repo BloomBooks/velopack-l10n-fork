@@ -38,12 +38,13 @@
       <None Include="$(MSBuildThisFileDirectory)..\artwork\DefaultApp.png" Pack="true" PackagePath="vendor" />
     </ItemGroup>
     <ItemGroup Condition=" '$(PackRustAssets)' == 'true' ">
-      <None Include="$(MSBuildThisFileDirectory)..\target\release\update.exe" Pack="true" PackagePath="vendor" />
-      <None Include="$(MSBuildThisFileDirectory)..\target\release\setup.exe" Pack="true" PackagePath="vendor" />
-      <None Include="$(MSBuildThisFileDirectory)..\target\release\stub.exe" Pack="true" PackagePath="vendor" />
-      <None Include="$(MSBuildThisFileDirectory)..\target\release\UpdateMac" Pack="true" PackagePath="vendor" />
-      <None Include="$(MSBuildThisFileDirectory)..\target\release\UpdateNix_x64" Pack="true" PackagePath="vendor" />
-      <None Include="$(MSBuildThisFileDirectory)..\target\release\UpdateNix_arm64" Pack="true" PackagePath="vendor" />
+      <None Include="$(MSBuildThisFileDirectory)..\target\release\update.exe" Pack="true" PackagePath="vendor" Condition="Exists('$(MSBuildThisFileDirectory)..\target\release\update.exe')" />
+      <None Include="$(MSBuildThisFileDirectory)..\target\release\setup.exe" Pack="true" PackagePath="vendor" Condition="Exists('$(MSBuildThisFileDirectory)..\target\release\setup.exe')" />
+      <None Include="$(MSBuildThisFileDirectory)..\target\release\stub.exe" Pack="true" PackagePath="vendor" Condition="Exists('$(MSBuildThisFileDirectory)..\target\release\stub.exe')" />
+      <!-- Windows-only fork: Skip macOS/Linux binaries -->
+      <!-- <None Include="$(MSBuildThisFileDirectory)..\target\release\UpdateMac" Pack="true" PackagePath="vendor" /> -->
+      <!-- <None Include="$(MSBuildThisFileDirectory)..\target\release\UpdateNix_x64" Pack="true" PackagePath="vendor" /> -->
+      <!-- <None Include="$(MSBuildThisFileDirectory)..\target\release\UpdateNix_arm64" Pack="true" PackagePath="vendor" /> -->
     </ItemGroup>
   </Target>
 
