@@ -8,7 +8,7 @@ use velopack::locator::{auto_locate_app_manifest, LocationContext};
 
 pub fn show_restart_required(app: &Manifest) {
     let version = app.version.to_string();
-    let title = localization::text_with_or(
+    let title = localization::text_with_default(
         "templates.setup_title",
         &[("app_title", app.title.as_str()), ("app_version", version.as_str())],
         "{app_title} Setup {app_version}",
@@ -37,12 +37,12 @@ pub fn show_update_missing_dependencies_dialog(
 
     let from_version = from.to_string();
     let to_version = to.to_string();
-    let title = localization::text_with_or(
+    let title = localization::text_with_default(
         "templates.update_title_no_version",
         &[("app_title", app.title.as_str())],
         "{app_title} Update",
     );
-    let header = localization::text_with_or(
+    let header = localization::text_with_default(
         "dialogs.update_missing_dependencies.header",
         &[
             ("app_title", app.title.as_str()),
@@ -51,7 +51,7 @@ pub fn show_update_missing_dependencies_dialog(
         ],
         "{app_title} would like to update from {from_version} to {to_version}",
     );
-    let content = localization::text_with_or(
+    let content = localization::text_with_default(
         "dialogs.update_missing_dependencies.content",
         &[
             ("app_title", app.title.as_str()),
@@ -72,17 +72,17 @@ pub fn show_setup_missing_dependencies_dialog(app: &Manifest, depedency_string: 
     }
 
     let version = app.version.to_string();
-    let title = localization::text_with_or(
+    let title = localization::text_with_default(
         "templates.setup_title",
         &[("app_title", app.title.as_str()), ("app_version", version.as_str())],
         "{app_title} Setup {app_version}",
     );
-    let header = localization::text_with_or(
+    let header = localization::text_with_default(
         "dialogs.setup_missing_dependencies.header",
         &[("app_title", app.title.as_str())],
         "{app_title} has missing system dependencies.",
     );
-    let content = localization::text_with_or(
+    let content = localization::text_with_default(
         "dialogs.setup_missing_dependencies.content",
         &[("app_title", app.title.as_str()), ("dependency_list", depedency_string)],
         "{app_title} requires the following packages to be installed: {dependency_list}. Would you like to continue?",
@@ -97,12 +97,12 @@ pub fn show_uninstall_complete_with_errors_dialog(app_title: &str, log_path: Opt
         return;
     }
 
-    let mut setup_name = WString::from_str(localization::text_with_or(
+    let mut setup_name = WString::from_str(localization::text_with_default(
         "templates.uninstall_title",
         &[("app_title", app_title)],
         "{app_title} Uninstall",
     ));
-    let mut instruction = WString::from_str(localization::text_with_or(
+    let mut instruction = WString::from_str(localization::text_with_default(
         "dialogs.uninstall_complete_with_errors.instruction",
         &[("app_title", app_title)],
         "{app_title} uninstall has completed with errors.",
@@ -121,7 +121,7 @@ pub fn show_uninstall_complete_with_errors_dialog(app_title: &str, log_path: Opt
     config.set_pszContent(Some(&mut content));
 
     let footer_path = log_path.map(|p| p.to_string_lossy().to_string()).unwrap_or("".to_string());
-    let mut footer = WString::from_str(localization::text_with_or(
+    let mut footer = WString::from_str(localization::text_with_default(
         "dialogs.uninstall_complete_with_errors.footer",
         &[("log_path", footer_path.as_str())],
         "Log file: '<A HREF=\"na\">{log_path}</A>'",
@@ -146,18 +146,18 @@ pub fn show_processes_locking_folder_dialog(app_title: &str, app_version: &str, 
     let mut config: w::TASKDIALOGCONFIG = Default::default();
     config.set_pszMainIcon(w::IconIdTdicon::Tdicon(co::TD_ICON::INFORMATION));
 
-    let mut update_name = WString::from_str(localization::text_with_or(
+    let mut update_name = WString::from_str(localization::text_with_default(
         "templates.update_title",
         &[("app_title", app_title), ("app_version", app_version)],
         "{app_title} Update {app_version}",
     ));
-    let mut instruction = WString::from_str(localization::text_with_or(
+    let mut instruction = WString::from_str(localization::text_with_default(
         "templates.update_title_no_version",
         &[("app_title", app_title)],
         "{app_title} Update",
     ));
 
-    let mut content = WString::from_str(localization::text_with_or(
+    let mut content = WString::from_str(localization::text_with_default(
         "dialogs.processes_locking_folder.content",
         &[("process_names", process_names), ("app_title", app_title)],
         "There are programs ({process_names}) preventing the {app_title} update from proceeding.\n\nYou can press Continue to have this updater attempt to close them automatically, or if you've closed them yourself press Retry for the updater to check again.",
@@ -209,23 +209,23 @@ pub fn show_overwrite_repair_dialog(app: &Manifest, root_path: &PathBuf, root_is
     let mut icon = co::TD_ICON::WARNING;
 
     let app_version = app.version.to_string();
-    let mut setup_name = WString::from_str(localization::text_with_or(
+    let mut setup_name = WString::from_str(localization::text_with_default(
         "templates.setup_title",
         &[("app_title", app.title.as_str()), ("app_version", app_version.as_str())],
         "{app_title} Setup {app_version}",
     ));
 
-    let mut instruction_text = localization::text_with_or(
+    let mut instruction_text = localization::text_with_default(
         "dialogs.overwrite_repair.default_instruction",
         &[("app_title", app.title.as_str())],
         "{app_title} is already installed.",
     );
-    let mut content_text = localization::text_with_or(
+    let mut content_text = localization::text_with_default(
         "dialogs.overwrite_repair.default_content",
         &[("app_title", app.title.as_str())],
         "This application is installed on your computer. If it is not functioning correctly, you can attempt to repair it.",
     );
-    let mut yes_button_text = localization::text_with_or(
+    let mut yes_button_text = localization::text_with_default(
         "buttons.repair",
         &[("app_version", app_version.as_str())],
         "Repair\nErase the application and re-install version {app_version}.",
@@ -241,12 +241,12 @@ pub fn show_overwrite_repair_dialog(app: &Manifest, root_path: &PathBuf, root_is
         let old_version = old.get_manifest_version();
         if old_version < app.version {
             let old_version_str = old_version.to_string();
-            instruction_text = localization::text_with_or(
+            instruction_text = localization::text_with_default(
                 "dialogs.overwrite_repair.update_instruction",
                 &[("app_title", app.title.as_str())],
                 "An older version of {app_title} is installed.",
             );
-            content_text = localization::text_with_or(
+            content_text = localization::text_with_default(
                 "dialogs.overwrite_repair.update_content",
                 &[
                     ("old_version", old_version_str.as_str()),
@@ -254,7 +254,7 @@ pub fn show_overwrite_repair_dialog(app: &Manifest, root_path: &PathBuf, root_is
                 ],
                 "Would you like to update from {old_version} to {new_version}?",
             );
-            yes_button_text = localization::text_with_or(
+            yes_button_text = localization::text_with_default(
                 "buttons.update",
                 &[("target_version", app_version.as_str())],
                 "Update\nTo version {target_version}",
@@ -262,17 +262,17 @@ pub fn show_overwrite_repair_dialog(app: &Manifest, root_path: &PathBuf, root_is
             icon = co::TD_ICON::INFORMATION;
         } else if old_version > app.version {
             let old_version_str = old_version.to_string();
-            instruction_text = localization::text_with_or(
+            instruction_text = localization::text_with_default(
                 "dialogs.overwrite_repair.downgrade_instruction",
                 &[("app_title", app.title.as_str())],
                 "A newer version of {app_title} is installed.",
             );
-            content_text = localization::text_with_or(
+            content_text = localization::text_with_default(
                 "dialogs.overwrite_repair.downgrade_content",
                 &[("old_version", old_version_str.as_str())],
                 "You already have {old_version} installed. Would you like to downgrade this application to an older version?",
             );
-            yes_button_text = localization::text_with_or(
+            yes_button_text = localization::text_with_default(
                 "buttons.downgrade",
                 &[("target_version", app_version.as_str())],
                 "Downgrade\nTo version {target_version}",
@@ -289,13 +289,13 @@ pub fn show_overwrite_repair_dialog(app: &Manifest, root_path: &PathBuf, root_is
 
     let custom_path = root_path.display().to_string();
     let footer_string = if root_is_default {
-        localization::text_with_or(
+        localization::text_with_default(
             "templates.install_directory_default",
             &[("app_id", app.id.as_str())],
             "The install directory is '<A HREF=\"na\">%LocalAppData%\\{app_id}</A>'",
         )
     } else {
-        localization::text_with_or(
+        localization::text_with_default(
             "templates.install_directory_custom",
             &[("path", custom_path.as_str())],
             "The install directory is '<A HREF=\"na\">{path}</A>'",

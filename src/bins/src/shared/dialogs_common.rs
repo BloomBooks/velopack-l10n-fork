@@ -49,12 +49,12 @@ pub fn ask_user_to_elevate(app_title: &str, new_version: &str) -> Result<()> {
         bail!("Not allowed to ask for elevated permissions because --silent flag is set.");
     }
 
-    let title = localization::text_with_or(
+    let title = localization::text_with_default(
         "templates.update_title_no_version",
         &[("app_title", app_title)],
         "{app_title} Update",
     );
-    let body = localization::text_with_or(
+    let body = localization::text_with_default(
         "dialogs.elevation_prompt.content",
         &[("app_title", app_title), ("new_version", new_version)],
         "{app_title} would like to update to version {new_version}, but requires elevated permissions to do so. Would you like to proceed?",

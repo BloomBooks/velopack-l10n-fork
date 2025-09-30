@@ -31,15 +31,13 @@ pub fn uninstall(locator: &VelopackLocator, delete_self: bool) -> Result<()> {
     let app_title = locator.get_manifest_title();
 
     info!("Finished successfully.");
-    let title = shared::localization::text_with_or(
+    let title = shared::localization::text_with_default(
         "templates.uninstall_title",
         &[("app_title", &app_title)],
         "{app_title} Uninstall",
     );
-    let content = shared::localization::text_or_default(
-        "dialogs.uninstall_success.content",
-        "The application was successfully uninstalled.",
-    );
+    let content =
+        shared::localization::text_or_default("dialogs.uninstall_success.content", "The application was successfully uninstalled.");
     shared::dialogs::show_info(title.as_str(), None, &content);
 
     let dead_path = root_path.join(".dead");
