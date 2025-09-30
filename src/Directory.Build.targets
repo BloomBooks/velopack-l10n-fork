@@ -1,14 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
-
   <PropertyGroup Condition=" '$(VelopackPackageId)' != '' ">
     <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <Copyright>Copyright © Velopack Ltd. All rights reserved.</Copyright>
-    <Authors>Velopack Ltd;Caelan Sayler;Kevin Bost</Authors>
+    <Authors>Velopack Ltd;Caelan Sayler;Kevin Bost;Bloom Books</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/velopack/velopack</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/velopack/velopack</RepositoryUrl>
-    <PackageTags>windows;macos;osx;updater;dotnet;installer;desktop;squirrel;velopack;autoupdate;automatic-updates</PackageTags>
+    <PackageProjectUrl>https://github.com/BloomBooks/velopack-l10n-fork</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/BloomBooks/velopack-l10n-fork</RepositoryUrl>
+    <PackageTags>windows;macos;osx;updater;dotnet;installer;desktop;squirrel;velopack;autoupdate;automatic-updates;unsupported;fork</PackageTags>
+    <Description>Unsupported localization fork of Velopack maintained by Bloom. Refer to https://github.com/BloomBooks/velopack-l10n-fork for details.</Description>
+    <PackageReleaseNotes>This package is published for Bloom localization scenarios and is not supported. For background and updates see https://github.com/BloomBooks/velopack-l10n-fork.</PackageReleaseNotes>
     <PackageIcon>Velopack_200.png</PackageIcon>
     <PackageReadmeFile>README_NUGET.md</PackageReadmeFile>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
@@ -25,12 +26,10 @@
     <DebugType>portable</DebugType>
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
-
   <ItemGroup Condition=" '$(VelopackPackageId)' != '' ">
     <None Include="$(MSBuildThisFileDirectory)..\artwork\Velopack_200.png" Pack="true" PackagePath="\" />
     <None Include="$(MSBuildThisFileDirectory)..\README_NUGET.md" Pack="true" PackagePath="\" />
   </ItemGroup>
-
   <Target Name="AddNugetVendorLibs" BeforeTargets="Build" Condition=" '$(VelopackPackageVendorLibs)' == 'true' ">
     <ItemGroup>
       <None Include="$(MSBuildThisFileDirectory)..\vendor\**" Pack="true" PackagePath="vendor" />
@@ -47,7 +46,6 @@
       <!-- <None Include="$(MSBuildThisFileDirectory)..\target\release\UpdateNix_arm64" Pack="true" PackagePath="vendor" /> -->
     </ItemGroup>
   </Target>
-
   <!--<Target Name="CleanPackageOutput" BeforeTargets="Build" Condition=" '$(VelopackPackageId)' != '' ">
     <ItemGroup>
       <_ExistingPackage Include="$(PackageOutputPath)\$(PackageId)*.nupkg" />
@@ -78,5 +76,4 @@
     <Exec Command='rd "$(HttpNuGetCache)" /q /s' Condition="'$(OS)' == 'Windows_NT'" />
     <Exec Command='rm -rf "$(HttpNuGetCache)"' Condition="'$(OS)' != 'Windows_NT'" />
   </Target>-->
-
 </Project>

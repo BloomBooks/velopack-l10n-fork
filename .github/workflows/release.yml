@@ -170,4 +170,25 @@ jobs:
           Write-Host "Uploading artifacts..."
           gh release upload $currentTag (get-item ../packages/*.nupkg)
 
-      # Note: External publishing (NuGet, npm, crates.io, PyPI) is disabled for this temporary fork.
+      - name: Publish BloomBooks.Velopack to NuGet (unlisted)
+        working-directory: ./repo
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.BLOOMBOOKS_NUGET }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          if ([string]::IsNullOrEmpty($env:NUGET_API_KEY)) {
+              throw "BLOOMBOOKS_NUGET secret must be configured to publish to NuGet."
+          }
+
+          $package = Get-ChildItem ../packages/BloomBooks.Velopack*.nupkg | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+          if (-not $package) {
+              throw "BloomBooks.Velopack package not found in ../packages."
+          }
+
+          Write-Host "Pushing $($package.Name) to NuGet..."
+          dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+
+          Write-Host "Unlisting BloomBooks.Velopack $env:PKG_VERSION on NuGet..."
+          dotnet nuget delete BloomBooks.Velopack $env:PKG_VERSION --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY --non-interactive
