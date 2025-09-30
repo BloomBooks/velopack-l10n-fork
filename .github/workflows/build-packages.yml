@@ -13,19 +13,11 @@ jobs:
         uses: ./.github/actions/job-setup
         with:
           update-dotnet: true
-      - name: Compute PKG_VERSION from run number
+      - name: Compute PKG_VERSION from Git version
         id: compute_version
         shell: pwsh
         run: |
-          $fourPart = (nbgv get-version -v Version).Trim()
-          $base = $fourPart.Split('-')[0]
-          $parts = $base.Split('.')
-          $major = if ($parts.Length -ge 1) { $parts[0] } else { '0' }
-          $minor = if ($parts.Length -ge 2) { $parts[1] } else { '0' }
-          $patch = if ($parts.Length -ge 3) { $parts[2] } else { '0' }
-          $build = $env:GITHUB_RUN_NUMBER
-          if ([string]::IsNullOrEmpty($build)) { $build = "0" }
-          $pkgVersion = "$major.$minor.$patch.$build"
+          $pkgVersion = (nbgv get-version -v NuGetPackageVersion).Trim()
           "pkg=$pkgVersion" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
       - name: Download Rust Artifacts
         uses: actions/download-artifact@v4
