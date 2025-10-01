@@ -358,7 +358,9 @@ fn parse_xliff_content(content: &str) -> Option<HashMap<String, String>> {
             let mut strings = HashMap::new();
             for trans_unit in xliff.file.body.trans_units {
                 let text = if let Some(target) = trans_unit.target { target.content } else { trans_unit.source.content };
-                strings.insert(trans_unit.id, text);
+                // Convert literal \n sequences to actual newlines
+                let processed_text = text.replace("\\n", "\n");
+                strings.insert(trans_unit.id, processed_text);
             }
             Some(strings)
         }
@@ -383,8 +385,10 @@ fn parse_po_content(content: &str) -> Option<HashMap<String, String>> {
         if line.starts_with("msgid ") {
             // Save previous entry if we have one
             if !current_msgid.is_empty() {
-                strings
-                    .insert(current_msgid.clone(), if current_msgstr.is_empty() { current_msgid.clone() } else { current_msgstr.clone() });
+                let final_text = if current_msgstr.is_empty() { current_msgid.clone() } else { current_msgstr.clone() };
+                // Convert literal \n sequences to actual newlines
+                let processed_text = final_text.replace("\\n", "\n");
+                strings.insert(current_msgid.clone(), processed_text);
             }
 
             current_msgid = parse_po_string(&line[6..]);
@@ -410,7 +414,10 @@ fn parse_po_content(content: &str) -> Option<HashMap<String, String>> {
 
     // Save the last entry
     if !current_msgid.is_empty() {
-        strings.insert(current_msgid.clone(), if current_msgstr.is_empty() { current_msgid } else { current_msgstr });
+        let final_text = if current_msgstr.is_empty() { current_msgid } else { current_msgstr };
+        // Convert literal \n sequences to actual newlines. The ui uses this for multi-line strings.
+        let processed_text = final_text.replace("\\n", "\n");
+        strings.insert(current_msgid.clone(), processed_text);
     }
 
     if strings.is_empty() {
