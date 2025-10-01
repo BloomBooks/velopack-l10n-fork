@@ -182,14 +182,20 @@ jobs:
               throw "BLOOMBOOKS_NUGET secret must be configured to publish to NuGet."
           }
 
-          $package = Get-ChildItem ../packages/BloomBooks.Velopack*.nupkg | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
-          if (-not $package) {
-              throw "BloomBooks.Velopack package not found in ../packages."
+          $exactPath = Join-Path ..\packages ("BloomBooks.Velopack." + $env:PKG_VERSION + ".nupkg")
+          if (Test-Path $exactPath) {
+            $package = Get-Item $exactPath
+          } else {
+            Write-Host "Exact package not found: $exactPath"
+            $package = Get-ChildItem ../packages/BloomBooks.Velopack*.nupkg | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
           }
+          if (-not $package) { throw "BloomBooks.Velopack package not found in ../packages." }
+          Write-Host "Using package: $($package.FullName)"
 
           Write-Host "Pushing $($package.Name) to NuGet..."
           dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
 
+          # Note: On nuget.org, 'dotnet nuget delete' UNLISTS the package version (hides it from search/UX); it does not remove the content.
           Write-Host "Unlisting BloomBooks.Velopack $env:PKG_VERSION on NuGet..."
           dotnet nuget delete BloomBooks.Velopack $env:PKG_VERSION --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY --non-interactive
 
@@ -205,16 +211,24 @@ jobs:
               throw "BLOOMBOOKS_NUGET secret must be configured to publish to NuGet."
           }
 
-          $package = Get-ChildItem ../packages/BloomBooks.Velopack.Cli*.nupkg | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+          $exactPath = Join-Path ..\packages ("BloomBooks.Velopack.Cli." + $env:PKG_VERSION + ".nupkg")
+          if (Test-Path $exactPath) {
+            $package = Get-Item $exactPath
+          } else {
+            Write-Host "Exact package not found: $exactPath"
+            $package = Get-ChildItem ../packages/BloomBooks.Velopack.Cli*.nupkg | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+          }
           if (-not $package) {
               Write-Host "BloomBooks.Velopack.Cli package not found in ../packages. Skipping CLI publication."
               return
           }
+          Write-Host "Using package: $($package.FullName)"
 
           Write-Host "Pushing $($package.Name) to NuGet..."
           try {
               dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
               
+              # Note: On nuget.org, 'dotnet nuget delete' UNLISTS the package version (hides it from search/UX); it does not remove the content.
               Write-Host "Unlisting BloomBooks.Velopack.Cli $env:PKG_VERSION on NuGet..."
               dotnet nuget delete BloomBooks.Velopack.Cli $env:PKG_VERSION --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY --non-interactive
           } catch {
