@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <VelopackPackageId>vpk</VelopackPackageId>
+    <VelopackPackageId>BloomBooks.Velopack.Cli</VelopackPackageId>
     <VelopackPackageVendorLibs>true</VelopackPackageVendorLibs>
     <ToolCommandName>vpk</ToolCommandName>
     <PackAsTool>true</PackAsTool>

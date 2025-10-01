@@ -192,3 +192,33 @@ jobs:
 
           Write-Host "Unlisting BloomBooks.Velopack $env:PKG_VERSION on NuGet..."
           dotnet nuget delete BloomBooks.Velopack $env:PKG_VERSION --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY --non-interactive
+
+      - name: Publish BloomBooks.Velopack.Cli to NuGet (unlisted)
+        working-directory: ./repo
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ secrets.BLOOMBOOKS_NUGET }}
+        run: |
+          $ErrorActionPreference = "Stop"
+
+          if ([string]::IsNullOrEmpty($env:NUGET_API_KEY)) {
+              throw "BLOOMBOOKS_NUGET secret must be configured to publish to NuGet."
+          }
+
+          $package = Get-ChildItem ../packages/BloomBooks.Velopack.Cli*.nupkg | Sort-Object LastWriteTimeUtc -Descending | Select-Object -First 1
+          if (-not $package) {
+              Write-Host "BloomBooks.Velopack.Cli package not found in ../packages. Skipping CLI publication."
+              return
+          }
+
+          Write-Host "Pushing $($package.Name) to NuGet..."
+          try {
+              dotnet nuget push $package.FullName --api-key $env:NUGET_API_KEY --source https://api.nuget.org/v3/index.json --skip-duplicate
+              
+              Write-Host "Unlisting BloomBooks.Velopack.Cli $env:PKG_VERSION on NuGet..."
+              dotnet nuget delete BloomBooks.Velopack.Cli $env:PKG_VERSION --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY --non-interactive
+          } catch {
+              Write-Host "Failed to publish BloomBooks.Velopack.Cli. This may be due to insufficient API key permissions for new package IDs."
+              Write-Host "Error: $_"
+              Write-Host "To resolve: Visit https://www.nuget.org/account/apikeys and ensure the API key has 'Push new packages and package versions' permission."
+          }

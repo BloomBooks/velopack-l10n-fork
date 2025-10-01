@@ -21,6 +21,8 @@ public class UpdateChecker
     public async Task<bool> CheckForUpdates()
     {
         if (_defaults.SkipUpdates) return false;
+        const string CliPackageId = "BloomBooks.Velopack.Cli";
+
         try {
             var myVer = VelopackRuntimeInfo.VelopackNugetVersion;
             var isPre = myVer.IsPrerelease || myVer.HasMetadata;
@@ -28,15 +30,15 @@ public class UpdateChecker
             if (_cache == null) {
                 var cancel = new CancellationTokenSource(3000);
                 var dl = new NuGetDownloader();
-                _cache = await dl.GetPackageMetadata("vpk", isPre ? "pre" : "latest", cancel.Token).ConfigureAwait(false);
+                _cache = await dl.GetPackageMetadata(CliPackageId, isPre ? "pre" : "latest", cancel.Token).ConfigureAwait(false);
             }
 
             var cacheVersion = _cache.Identity.Version;
             if (cacheVersion > myVer) {
                 if (!isPre) {
-                    _logger.Warn($"[bold]There is a newer version of vpk available ({cacheVersion}). Run 'dotnet tool update -g vpk'[/]");
+                    _logger.Warn($"[bold]There is a newer version of vpk available ({cacheVersion}). Run 'dotnet tool update -g {CliPackageId}'[/]");
                 } else {
-                    _logger.Warn($"[bold]There is a newer version of vpk available. Run 'dotnet tool update -g vpk --version {cacheVersion}'[/]");
+                    _logger.Warn($"[bold]There is a newer version of vpk available. Run 'dotnet tool update -g {CliPackageId} --version {cacheVersion}'[/]");
                 }
 
                 return true;
