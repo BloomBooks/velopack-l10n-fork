@@ -40,6 +40,42 @@ jobs:
         run: |
           dotnet build -c Release /p:PackRustAssets=true /p:ContinuousIntegrationBuild=true \
             /p:Version=${{ steps.compute_version.outputs.pkg }} /p:PackageVersion=${{ steps.compute_version.outputs.pkg }}
+      - name: List built packages
+        run: |
+          echo "Listing .nupkg files under build/Release:"
+          ls -al build/Release || true
+          echo
+          echo "Found packages:"
+          ls -1 build/Release/*nupkg || true
+      - name: Validate expected BloomBooks packages exist
+        shell: bash
+        run: |
+          set -u
+          VERSION='${{ steps.compute_version.outputs.pkg }}'
+          MAIN="build/Release/BloomBooks.Velopack.${VERSION}.nupkg"
+          CLI="build/Release/BloomBooks.Velopack.Cli.${VERSION}.nupkg"
+          echo "Expected main package: $MAIN"
+          echo "Expected CLI package : $CLI"
+          missing=0
+          if [ -f "$MAIN" ]; then
+            echo "✅ Found: $MAIN"
+          else
+            echo "❌ Missing required package: $MAIN"
+            missing=1
+          fi
+          if [ -f "$CLI" ]; then
+            echo "✅ Found: $CLI"
+          else
+            echo "❌ Missing required package: $CLI"
+            missing=1
+          fi
+          echo
+          echo "Other packages present:"
+          ls -1 build/Release/*.nupkg 2>/dev/null || true
+          if [ "$missing" -ne 0 ]; then
+            echo "One or more required packages are missing. Failing the job."
+            exit 1
+          fi
       - name: Write Version File
         run: echo "${{ steps.compute_version.outputs.pkg }}" > version.txt
       - name: Upload version file as artifact
