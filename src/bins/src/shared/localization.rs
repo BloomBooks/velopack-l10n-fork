@@ -414,10 +414,10 @@ fn parse_po_content(content: &str) -> Option<HashMap<String, String>> {
 
     // Save the last entry
     if !current_msgid.is_empty() {
-        let final_text = if current_msgstr.is_empty() { current_msgid } else { current_msgstr };
+        let final_text = if current_msgstr.is_empty() { current_msgid.clone() } else { current_msgstr };
         // Convert literal \n sequences to actual newlines. The ui uses this for multi-line strings.
         let processed_text = final_text.replace("\\n", "\n");
-        strings.insert(current_msgid.clone(), processed_text);
+        strings.insert(current_msgid, processed_text);
     }
 
     if strings.is_empty() {
