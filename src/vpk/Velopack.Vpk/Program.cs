@@ -27,6 +27,10 @@ namespace Velopack.Vpk;
 
 public class Program
 {
+    public static CliOption<bool> VersionOption { get; }
+        = new CliOption<bool>("--version", "-v")
+        .SetDescription("Print the version number and exit.");
+
     public static CliOption<bool> VerboseOption { get; }
         = new CliOption<bool>("--verbose")
         .SetRecursive(true)
@@ -67,6 +71,7 @@ public class Program
         CliRootCommand rootCommand = new CliRootCommand(INTRO);
         rootCommand.Options.Clear(); // remove the default help option
         rootCommand.Options.Add(new LongHelpCommand());
+        rootCommand.Options.Add(VersionOption);
         rootCommand.Options.Add(LegacyConsoleOption);
         rootCommand.Options.Add(YesOption);
         rootCommand.Options.Add(VerboseOption);
@@ -77,6 +82,11 @@ public class Program
 
         rootCommand.TreatUnmatchedTokensAsErrors = false;
         ParseResult parseResult = rootCommand.Parse(args);
+        // Handle version early: print only the version number and exit.
+        if (parseResult.GetValue(VersionOption)) {
+            Console.Out.WriteLine(VelopackRuntimeInfo.VelopackNugetVersion.ToNormalizedString());
+            return 0;
+        }
         bool verbose = parseResult.GetValue(VerboseOption);
         bool legacyConsole = parseResult.GetValue(LegacyConsoleOption)
             || Console.IsOutputRedirected
