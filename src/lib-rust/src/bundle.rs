@@ -122,6 +122,19 @@ impl BundleZip<'_> {
         Some(bytes)
     }
 
+    pub fn get_progress_color(&mut self) -> Option<String> {
+        match self.read_manifest() {
+            Ok(manifest) => {
+                if manifest.progress_color.is_empty() {
+                    None
+                } else {
+                    Some(manifest.progress_color)
+                }
+            }
+            Err(_) => None,
+        }
+    }
+
     pub fn find_zip_file<F>(&self, predicate: F) -> Option<usize>
     where
         F: Fn(&str) -> bool,
@@ -373,6 +386,7 @@ pub struct Manifest {
     pub shortcut_amuid: String,
     pub release_notes: String,
     pub release_notes_html: String,
+    pub progress_color: String,
 }
 
 /// Parse manifest object from an XML string.
@@ -421,6 +435,8 @@ pub fn read_manifest_from_string(xml: &str) -> Result<Manifest, Error> {
                     obj.release_notes = text;
                 } else if el_name == "releaseNotesHtml" {
                     obj.release_notes_html = text;
+                } else if el_name == "progressColor" {
+                    obj.progress_color = text;
                 }
             }
             Ok(XmlEvent::EndElement { .. }) => {
@@ -546,4 +562,57 @@ fn test_parse_package_file_name() {
     assert!(parse_package_file_name("MyCoolApp-1.2.3-beta1-win7-x64-full.zip").is_none());
     assert!(parse_package_file_name("MyCoolApp-1.2.3.nupkg").is_none());
     assert!(parse_package_file_name("MyCoolApp-1.2-full.nupkg").is_none());
+}
+
+#[test]
+fn test_manifest_progress_color_parsing() {
+    // Test with progress color
+    let xml_with_color = r#"<?xml version="1.0" encoding="utf-8"?>
+    <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+        <metadata>
+            <id>TestApp</id>
+            <version>1.0.0</version>
+            <title>Test Application</title>
+            <authors>Test Author</authors>
+            <description>Test Description</description>
+            <mainExe>test.exe</mainExe>
+            <progressColor>#FF0000</progressColor>
+        </metadata>
+    </package>"#;
+    
+    let manifest = read_manifest_from_string(xml_with_color).unwrap();
+    assert_eq!(manifest.progress_color, "#FF0000");
+
+    // Test without progress color (should default to empty)
+    let xml_without_color = r#"<?xml version="1.0" encoding="utf-8"?>
+    <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+        <metadata>
+            <id>TestApp</id>
+            <version>1.0.0</version>
+            <title>Test Application</title>
+            <authors>Test Author</authors>
+            <description>Test Description</description>
+            <mainExe>test.exe</mainExe>
+        </metadata>
+    </package>"#;
+    
+    let manifest = read_manifest_from_string(xml_without_color).unwrap();
+    assert_eq!(manifest.progress_color, "");
+
+    // Test with empty progress color
+    let xml_empty_color = r#"<?xml version="1.0" encoding="utf-8"?>
+    <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+        <metadata>
+            <id>TestApp</id>
+            <version>1.0.0</version>
+            <title>Test Application</title>
+            <authors>Test Author</authors>
+            <description>Test Description</description>
+            <mainExe>test.exe</mainExe>
+            <progressColor></progressColor>
+        </metadata>
+    </package>"#;
+    
+    let manifest = read_manifest_from_string(xml_empty_color).unwrap();
+    assert_eq!(manifest.progress_color, "");
 }

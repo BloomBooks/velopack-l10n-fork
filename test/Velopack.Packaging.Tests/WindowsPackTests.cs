@@ -935,4 +935,51 @@ public class WindowsPackTests
             File.WriteAllText(testStringFile, oldText);
         }
     }
+
+    [SkippableFact]
+    public void PackBuildWithProgressColor()
+    {
+        Skip.IfNot(VelopackRuntimeInfo.IsWindows);
+
+        using var logger = _output.BuildLoggerFor<WindowsPackTests>();
+
+        using var _1 = TempUtil.GetTempDirectory(out var tmpOutput);
+        using var _2 = TempUtil.GetTempDirectory(out var tmpReleaseDir);
+        using var _3 = TempUtil.GetTempDirectory(out var unzipDir);
+
+        var exe = "testapp.exe";
+        var id = "Test.ProgressColor-App";
+        var version = "1.0.0";
+        var progressColor = "#FF0000";
+
+        PathHelper.CopyRustAssetTo(exe, tmpOutput);
+
+        var options = new WindowsPackOptions {
+            EntryExecutableName = exe,
+            ReleaseDir = new DirectoryInfo(tmpReleaseDir),
+            PackId = id,
+            PackVersion = version,
+            PackDirectory = tmpOutput,
+            TargetRuntime = RID.Parse("win-x64"),
+            ProgressColor = progressColor,
+        };
+
+        var runner = GetPackRunner(logger);
+        runner.Run(options).GetAwaiterResult();
+
+        var nupkgPath = Path.Combine(tmpReleaseDir, $"{id}-{version}-full.nupkg");
+        Assert.True(File.Exists(nupkgPath));
+
+        // Extract and verify progress color is in the nuspec
+        EasyZip.ExtractZipToDirectory(logger.ToVelopackLogger(), nupkgPath, unzipDir);
+
+        var nuspecPath = Path.Combine(unzipDir, $"{id}.nuspec");
+        Assert.True(File.Exists(nuspecPath));
+        var xml = XDocument.Load(nuspecPath);
+
+        // Verify progress color is in the metadata
+        var progressColorElement = xml.Root.ElementsNoNamespace("metadata").Single().ElementsNoNamespace("progressColor").SingleOrDefault();
+        Assert.NotNull(progressColorElement);
+        Assert.Equal(progressColor, progressColorElement.Value);
+    }
 }

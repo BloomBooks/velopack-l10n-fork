@@ -47,6 +47,10 @@ public class WindowsPackCommandRunner : PackageBuilder<WindowsPackOptions>
         ExtraNuspecMetadata["runtimeDependencies"] = GetRuntimeDependencies();
         ExtraNuspecMetadata["shortcutLocations"] = GetShortcutLocations();
         ExtraNuspecMetadata["shortcutAmuid"] = CoreUtil.GetAppUserModelId(Options.PackId);
+        
+        if (!string.IsNullOrEmpty(Options.ProgressColor)) {
+            ExtraNuspecMetadata["progressColor"] = Options.ProgressColor;
+        }
 
         // copy files to temp dir, so we can modify them
         var dir = TempDir.CreateSubdirectory("PreprocessPackDirWin");

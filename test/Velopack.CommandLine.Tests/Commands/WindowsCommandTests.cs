@@ -82,6 +82,52 @@ public abstract class ReleaseCommandTests<T> : BaseCommandTests<T>
     }
 
     [Fact]
+    public void ProgressColor_WithValidHexColor_ParsesValue()
+    {
+        var command = new T();
+
+        string cli = GetRequiredDefaultOptions() + $"--progressColor \"#FF0000\"";
+        ParseResult parseResult = command.ParseAndApply(cli);
+
+        Assert.Equal("#FF0000", command.ProgressColor);
+        Assert.Empty(parseResult.Errors);
+    }
+
+    [Theory]
+    [InlineData("#00FF00")]  // Green
+    [InlineData("#0066CC")]  // Blue
+    [InlineData("#ABCDEF")]  // Mixed case
+    [InlineData("#123456")]  // Numbers
+    public void ProgressColor_WithValidHexColors_ParsesValues(string color)
+    {
+        var command = new T();
+
+        string cli = GetRequiredDefaultOptions() + $"--progressColor \"{color}\"";
+        ParseResult parseResult = command.ParseAndApply(cli);
+
+        Assert.Equal(color, command.ProgressColor);
+        Assert.Empty(parseResult.Errors);
+    }
+
+    [Theory]
+    [InlineData("FF0000")]     // Missing #
+    [InlineData("#FF00")]      // Too short
+    [InlineData("#FF00000")]   // Too long
+    [InlineData("#GG0000")]    // Invalid hex chars
+    [InlineData("red")]        // Text color
+    [InlineData("#ff-000")]    // Invalid format
+    public void ProgressColor_WithInvalidHexColor_ShowsError(string invalidColor)
+    {
+        var command = new T();
+
+        string cli = GetRequiredDefaultOptions() + $"--progressColor \"{invalidColor}\"";
+        ParseResult parseResult = command.ParseAndApply(cli);
+
+        Assert.Single(parseResult.Errors);
+        Assert.Contains("Color must be a valid hex color", parseResult.Errors[0].Message);
+    }
+
+    [Fact]
     public void Icon_WithValidFile_ParsesValue()
     {
         FileInfo fileInfo = CreateTempFile(name: Path.ChangeExtension(Path.GetRandomFileName(), ".ico"));

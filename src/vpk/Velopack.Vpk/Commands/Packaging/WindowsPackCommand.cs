@@ -6,6 +6,8 @@ public class WindowsPackCommand : PackCommand
 
     public string SplashImage { get; private set; }
 
+    public string ProgressColor { get; private set; }
+
     public bool SkipVelopackAppCheck { get; private set; }
 
     public string SignParameters { get; private set; }
@@ -38,6 +40,11 @@ public class WindowsPackCommand : PackCommand
             .SetDescription("Path to image displayed during installation.")
             .SetArgumentHelpName("PATH")
             .MustExist();
+
+        AddOption<string>((v) => ProgressColor = v, "--progressColor")
+            .SetDescription("Hex color for progress bar (e.g., #00FF00 for green, #FF0000 for red).")
+            .SetArgumentHelpName("COLOR")
+            .MustBeValidHexColor();
 
         AddOption<bool>((v) => SkipVelopackAppCheck = v, "--skipVeloAppCheck")
             .SetDescription("Skip the VelopackApp builder verification.")

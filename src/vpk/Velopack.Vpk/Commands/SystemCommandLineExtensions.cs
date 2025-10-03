@@ -163,6 +163,12 @@ internal static class SystemCommandLineExtensions
         return option;
     }
 
+    public static CliOption<string> MustBeValidHexColor(this CliOption<string> option)
+    {
+        option.Validators.Add(Validate.MustBeValidHexColor);
+        return option;
+    }
+
     public static CliOption<FileInfo> MustExist(this CliOption<FileInfo> option)
     {
         option.Validators.Add(Validate.FileMustExist);
@@ -363,6 +369,16 @@ internal static class SystemCommandLineExtensions
             for (var i = 0; i < result.Tokens.Count; i++) {
                 if (!Regex.IsMatch(result.Tokens[i].Value, @"^(?<os>osx|linux|win)\.?(?<ver>[\d\.]+)?(?:-(?<arch>(?:x|arm)\d{2}))$")) {
                     result.AddError($"Invalid or unsupported runtime '{result.IdentifierToken.Value}'. Valid example: win-x64, osx-arm64.");
+                    break;
+                }
+            }
+        }
+
+        public static void MustBeValidHexColor(OptionResult result)
+        {
+            for (var i = 0; i < result.Tokens.Count; i++) {
+                if (!Regex.IsMatch(result.Tokens[i].Value, @"^#[0-9A-Fa-f]{6}$")) {
+                    result.AddError($"Color must be a valid hex color (e.g., #00FF00 for green). Current value is '{result.Tokens[i].Value}'.");
                     break;
                 }
             }

@@ -128,7 +128,8 @@ pub fn install(pkg: &mut BundleZip, install_to: Option<&PathBuf>, start_args: Op
     } else {
         info!("Reading splash image...");
         let splash_bytes = pkg.get_splash_bytes();
-        windows::splash::show_splash_dialog(locator.get_manifest_title(), splash_bytes)
+        let progress_color = pkg.get_progress_color();
+        windows::splash::show_splash_dialog(locator.get_manifest_title(), splash_bytes, progress_color)
     };
 
     let install_result = install_impl(pkg, &locator, &tx, start_args);

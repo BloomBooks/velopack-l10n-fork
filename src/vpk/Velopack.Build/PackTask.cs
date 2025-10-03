@@ -82,6 +82,8 @@ public class PackTask : MSBuildAsyncTask
 
     public string? SplashImage { get; set; }
 
+    public string? ProgressColor { get; set; }
+
     public bool SkipVelopackAppCheck { get; set; }
 
     public string? SignParameters { get; set; }

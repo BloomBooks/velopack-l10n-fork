@@ -28,12 +28,12 @@ pub fn show_progress_dialog<T1: AsRef<str>, T2: AsRef<str>>(window_title: T1, co
     tx
 }
 
-pub fn show_splash_dialog(app_name: String, imgstream: Option<Vec<u8>>) -> Sender<i16> {
+pub fn show_splash_dialog(app_name: String, imgstream: Option<Vec<u8>>, progress_color: Option<String>) -> Sender<i16> {
     let (tx, rx) = mpsc::channel::<i16>();
     thread::spawn(move || {
         info!("Showing splash screen immediately...");
         if imgstream.is_some() {
-            let _ = SplashWindow::new(app_name, imgstream.unwrap(), rx).and_then(|w| {
+            let _ = SplashWindow::new(app_name, imgstream.unwrap(), rx, progress_color).and_then(|w| {
                 w.run()?;
                 Ok(())
             });
@@ -54,6 +54,7 @@ pub struct SplashWindow {
     delay: u16,
     progress: Rc<RefCell<i16>>,
     frame_idx: Rc<RefCell<usize>>,
+    progress_color: (u8, u8, u8),
     w: u16,
     h: u16,
 }
@@ -73,8 +74,24 @@ fn convert_rgba_to_bgra(image_data: &mut Vec<u8>) {
     }
 }
 
+fn parse_hex_color(color_str: Option<String>) -> (u8, u8, u8) {
+    if let Some(color) = color_str {
+        if color.len() == 7 && color.starts_with('#') {
+            if let (Ok(r), Ok(g), Ok(b)) = (
+                u8::from_str_radix(&color[1..3], 16),
+                u8::from_str_radix(&color[3..5], 16),
+                u8::from_str_radix(&color[5..7], 16),
+            ) {
+                return (r, g, b);
+            }
+        }
+    }
+    // Default to green if parsing fails
+    (0, 255, 0)
+}
+
 impl SplashWindow {
-    pub fn new(app_name: String, img_stream: Vec<u8>, rx: Receiver<i16>) -> Result<Self> {
+    pub fn new(app_name: String, img_stream: Vec<u8>, rx: Receiver<i16>, progress_color: Option<String>) -> Result<Self> {
         let mut delays = Vec::new();
         let mut frames = Vec::new();
         let fmt_cursor = Cursor::new(&img_stream);
@@ -133,7 +150,8 @@ impl SplashWindow {
         let rx = Rc::new(rx);
         let progress = Rc::new(RefCell::new(0));
         let frame_idx = Rc::new(RefCell::new(0));
-        let mut new_self = Self { wnd, frames, delay, frame_idx, w, h, rx, progress };
+        let progress_color = parse_hex_color(progress_color);
+        let mut new_self = Self { wnd, frames, delay, frame_idx, w, h, rx, progress, progress_color };
         new_self.events();
         Ok(new_self)
     }
@@ -227,7 +245,8 @@ impl SplashWindow {
 
             // draw progress bar to hdc_mem
             let progress = self2.progress.borrow();
-            let progress_brush = w::HBRUSH::CreateSolidBrush(w::COLORREF::new(0, 255, 0))?;
+            let color = self2.progress_color;
+            let progress_brush = w::HBRUSH::CreateSolidBrush(w::COLORREF::new(color.0, color.1, color.2))?;
             let progress_width = (rect.right as f32 * (*progress as f32 / 100.0)) as i32;
             let progress_rect = w::RECT { left: 0, bottom: rect.bottom, right: progress_width, top: rect.bottom - 10 };
             hdc_mem.FillRect(progress_rect, &progress_brush)?;
@@ -373,7 +392,7 @@ extern "system" fn task_dialog_callback(hwnd: w::HWND, msg: co::TDN, _: usize, _
 #[ignore]
 fn show_test_gif() {
     let rd = std::fs::read(r"C:\Source\Clowd\artwork\splash.gif").unwrap();
-    let tx = show_splash_dialog("osu!".to_string(), Some(rd));
+    let tx = show_splash_dialog("osu!".to_string(), Some(rd), Some("#FF0000".to_string()));
     tx.send(80).unwrap();
     std::thread::sleep(std::time::Duration::from_secs(6));
 }
@@ -399,4 +418,24 @@ fn show_test_progress() {
 
     let _ = tx.send(MSG_CLOSE);
     std::thread::sleep(std::time::Duration::from_secs(3));
+}
+
+#[test]
+fn test_parse_hex_color() {
+    // Test valid colors
+    assert_eq!(parse_hex_color(Some("#FF0000".to_string())), (255, 0, 0));    // Red
+    assert_eq!(parse_hex_color(Some("#00FF00".to_string())), (0, 255, 0));    // Green
+    assert_eq!(parse_hex_color(Some("#0000FF".to_string())), (0, 0, 255));    // Blue
+    assert_eq!(parse_hex_color(Some("#ABCDEF".to_string())), (171, 205, 239)); // Mixed
+    assert_eq!(parse_hex_color(Some("#123456".to_string())), (18, 52, 86));    // Numbers
+
+    // Test invalid colors (should fallback to default green)
+    assert_eq!(parse_hex_color(Some("FF0000".to_string())), (0, 255, 0));     // Missing #
+    assert_eq!(parse_hex_color(Some("#FF00".to_string())), (0, 255, 0));      // Too short
+    assert_eq!(parse_hex_color(Some("#FF00000".to_string())), (0, 255, 0));   // Too long
+    assert_eq!(parse_hex_color(Some("#GG0000".to_string())), (0, 255, 0));    // Invalid hex
+    assert_eq!(parse_hex_color(Some("red".to_string())), (0, 255, 0));        // Text color
+    
+    // Test None (should fallback to default green)
+    assert_eq!(parse_hex_color(None), (0, 255, 0));
 }
