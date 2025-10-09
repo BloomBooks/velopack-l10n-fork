@@ -146,4 +146,4 @@ msgid "dialogs.legacy_migration_failed.content"
 msgstr "This app installation has been corrupted and cannot be started. Please re-install the app."
 
 msgid "dialogs.uninstall_success.content"
-msgstr "The application was successfully uninstalled."
+msgstr "{app_title} was successfully uninstalled."

@@ -23,8 +23,8 @@
                 <target xml:lang="es">Actualización</target>
             </trans-unit>
             <trans-unit id="templates.uninstall_title">
-                <source xml:lang="en">Uninstall {0}</source>
-                <target xml:lang="es">Desinstalar {0}</target>
+                <source xml:lang="en">{app_title} Uninstall</source>
+                <target xml:lang="es">Desinstalar {app_title}</target>
             </trans-unit>
             <trans-unit id="templates.error_title">
                 <source xml:lang="en">Error</source>
@@ -179,8 +179,8 @@
                 <target xml:lang="es">Falló la migración del instalador heredado. Es posible que necesite desinstalar la versión anterior primero.</target>
             </trans-unit>
             <trans-unit id="dialogs.uninstall_success.content">
-                <source xml:lang="en">{0} has been successfully uninstalled.</source>
-                <target xml:lang="es">{0} ha sido desinstalado exitosamente.</target>
+                <source xml:lang="en">{app_title} was successfully uninstalled.</source>
+                <target xml:lang="es">{app_title} se desinstaló correctamente.</target>
             </trans-unit>
         </body>
     </file>

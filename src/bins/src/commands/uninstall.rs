@@ -1,5 +1,5 @@
 use crate::shared::{self};
-use velopack::{constants, locator::VelopackLocator};
+use velopack::{bundle::load_bundle_from_file, constants, locator::{find_latest_full_package, VelopackLocator}};
 
 use crate::windows;
 use anyhow::Result;
@@ -7,6 +7,19 @@ use std::fs::File;
 
 pub fn uninstall(locator: &VelopackLocator, delete_self: bool) -> Result<()> {
     info!("Command: Uninstall");
+
+    // Initialize localization strings from the installed package if available
+    let packages_dir = locator.get_packages_dir();
+    if let Some((package_path, _)) = find_latest_full_package(&packages_dir) {
+        if let Ok(bundle) = load_bundle_from_file(&package_path) {
+            shared::localization::initialize_from_bundle(&bundle);
+            info!("Localization initialized from package: {}", package_path.to_string_lossy());
+        } else {
+            warn!("Failed to load bundle from package for localization");
+        }
+    } else {
+        warn!("No package found for localization, using defaults");
+    }
 
     let root_path = locator.get_root_dir();
 
@@ -36,8 +49,11 @@ pub fn uninstall(locator: &VelopackLocator, delete_self: bool) -> Result<()> {
         &[("app_title", &app_title)],
         "{app_title} Uninstall",
     );
-    let content =
-        shared::localization::text_or_default("dialogs.uninstall_success.content", "The application was successfully uninstalled.");
+    let content = shared::localization::text_with_default(
+        "dialogs.uninstall_success.content",
+        &[("app_title", &app_title)],
+        "{app_title} was successfully uninstalled.",
+    );
     shared::dialogs::show_info(title.as_str(), None, &content);
 
     let dead_path = root_path.join(".dead");
