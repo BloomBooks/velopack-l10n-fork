@@ -9,6 +9,9 @@ This is fork of Velopack, with a few changes we need so that we can ship with lo
 
 See Readme-localization.md
 
+> [!NOTE]
+> The Velopack primary repo has recently been localized into 39 languages.
+
 ## --progressColor
 
 We needed to customize the color of the progress bar displayed during installation to match our app colors.
