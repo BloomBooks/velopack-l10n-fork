@@ -1,3 +1,6 @@
+> [!NOTE]
+> The [Velopack primary repo](https://github.com/velopack/velopack) has recently been localized into 39 languages.
+>
 # Velopack Localization Guide
 
 We have made this fork so that we can localize while waiting for the official Velopack solution. See https://github.com/velopack/velopack/issues/60.
